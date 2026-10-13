@@ -1,0 +1,237 @@
+/* The galley: the record set line by line, numbered on the left, with a ruled proof
+   margin on the right. Every row is a subgrid of the same four columns, so a margin note
+   always sits level with the line it marks; nothing is measured in script. */
+
+.record-panel {
+  container-type: inline-size;
+}
+
+.record-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.galley {
+  --gutter: 2.75rem;
+  --label: 8.75rem;
+  --margin: 15.5rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: [gutter] var(--gutter) [label] var(--label) [text] minmax(0, 1fr) [margin] var(--margin) [end];
+  align-content: start;
+  padding-block: 0.75rem 2rem;
+  border: 1px solid var(--hair);
+  background: var(--sheet);
+  box-shadow: var(--shadow);
+  counter-reset: line;
+}
+
+/* The two rules every galley carries: the line-number gutter and the proof margin. */
+.galley::before,
+.galley::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--hair);
+  pointer-events: none;
+}
+
+.galley::before {
+  left: var(--gutter);
+}
+
+.galley::after {
+  right: var(--margin);
+}
+
+.gblock,
+.gbody,
+.glist,
+.gline,
+.gl-cell {
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+.gblock,
+.glist,
+.gline {
+  grid-column: 1 / -1;
+}
+
+.gblock {
+  position: relative;
+}
+
+.gbody {
+  grid-row: 1;
+  grid-column: 1 / -2;
+  align-content: start;
+}
+
+.glist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gline {
+  position: relative;
+  padding-block: 0.6rem;
+  counter-increment: line;
+}
+
+/* Real line numbers: a recruiter can say "line 4" and mean one detail. */
+.gline::before {
+  content: counter(line);
+  grid-column: gutter;
+  justify-self: end;
+  padding-right: 0.7rem;
+  color: var(--muted);
+  font: 400 0.72rem/1.55rem var(--font-typed);
+  font-variant-numeric: tabular-nums;
+}
+
+.gline::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--gutter);
+  right: 0;
+  border-top: 1px solid var(--faint);
+}
+
+/* Lines that run on into the margin column stop their rule at the margin. */
+.galley > .gblock > .gline::after {
+  right: var(--margin);
+}
+
+.gsec {
+  grid-column: label / -1;
+  margin: 1.9rem 0 0.4rem;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.gl-label {
+  grid-column: label;
+  padding: 0.15rem 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.gl-value,
+.gl-wide {
+  min-width: 0;
+  padding-right: 1.25rem;
+}
+
+.gl-value {
+  grid-column: text;
+}
+
+.gl-wide {
+  grid-column: label / -1;
+}
+
+.gl-cell {
+  grid-column: text / end;
+}
+
+.gl-cell > .gl-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  grid-column: 1;
+}
+
+.gnote {
+  grid-row: 1;
+  grid-column: -2 / -1;
+  align-self: start;
+  padding: 0.55rem 1.1rem 0.55rem 1.2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.gl-cell > .gnote {
+  padding-block: 0;
+}
+
+.gnote-query {
+  color: var(--red);
+}
+
+.gnote-blue {
+  color: var(--blue);
+}
+
+.gnote h4 {
+  margin-bottom: 0.35rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.gnote li + li {
+  margin-top: 0.3rem;
+}
+
+.query-word {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* A narrow galley folds the margin in: each note follows the line it marks. */
+@container (max-width: 46rem) {
+  .galley {
+    --gutter: 2.1rem;
+    --margin: 0px;
+    grid-template-columns: [gutter] var(--gutter) [label text] minmax(0, 1fr) [margin end];
+  }
+
+  .galley::after,
+  .bracket {
+    display: none;
+  }
+
+  .gbody,
+  .gnote {
+    grid-row: auto;
+    grid-column: 1 / -1;
+  }
+
+  .gblock > .gnote {
+    grid-column: 2 / -1;
+  }
+
+  .gl-cell > .gnote {
+    padding: 0.25rem 0 0;
+  }
+
+  .gnote {
+    padding: 0.5rem 1rem 0.75rem 0;
+  }
+
+  .gl-label {
+    padding-top: 0;
+  }
+
+  .slot {
+    margin-right: 0;
+  }
+
+  .galley > .gblock > .gline::after {
+    right: 0;
+  }
+}

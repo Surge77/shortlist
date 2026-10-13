@@ -1,0 +1,147 @@
+{
+  "title": "Choose Shortlist's visual world",
+  "question": "The roll assigned Galley Proof. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Galley Proof",
+      "kicker": "THE ROLL",
+      "lineage": "typesetters' galley proofs and BS 5261 proofreading marks",
+      "thesis": "The machine sets the resume as a galley proof; every check is a proof mark in the margin.",
+      "palette": ["#eef0ec", "#161616", "#1e56c8", "#d0201a", "#b9bdb5"],
+      "materials": ["cool galley stock", "blue and red proof pencil", "one-pixel ruled hairlines"],
+      "viewport": "The original (the manuscript) beside one long machine-set galley of the record, with a ruled proof margin where flags and the computed experience tally are marked.",
+      "risk": "Turns bookish if set in a serif on cream; it must stay on cool galley stock with a grotesque text face.",
+      "raised": [
+        { "from": "challenger-centre-rail", "raise": "No radius anywhere; every rule and mark drawn at one device pixel in three ink values plus the two proof colours." },
+        { "from": "challenger-coupon-wallet", "raise": "Missing details stay printed as empty ruled slots carrying their proof mark, never silently omitted." },
+        { "from": "challenger-orienteering", "raise": "Proof red is reserved for what the recruiter must check and appears nowhere else." }
+      ],
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "slug line (name, file, status)", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "manuscript (original)", "x": 0, "y": 1, "w": 5, "h": 9 },
+          { "label": "galley (record)", "x": 5, "y": 1, "w": 5, "h": 9, "accent": true },
+          { "label": "proof margin", "x": 10, "y": 1, "w": 2, "h": 9 }
+        ]
+      }
+    },
+    {
+      "id": "model-pick",
+      "label": "Application Form",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "official application forms with a For Office Use Only column",
+      "thesis": "The record is a filled-in official form, and the code's checks tick the office-use-only column.",
+      "palette": ["#fafaf7", "#111111", "#1b3a8c", "#b3261e"],
+      "materials": ["numbered form boxes", "rubber stamp", "carbon copy"],
+      "viewport": "Numbered boxed fields beside the original, with a shaded office-use-only column where each check is ticked or stamped.",
+      "risk": "The most familiar reading of HR paperwork; it can feel bureaucratic and dense.",
+      "wireframe": {
+        "cols": 12,
+        "rows": 10,
+        "regions": [
+          { "label": "form header", "x": 0, "y": 0, "w": 12, "h": 1 },
+          { "label": "original", "x": 0, "y": 1, "w": 5, "h": 9 },
+          { "label": "numbered fields", "x": 5, "y": 1, "w": 5, "h": 9, "accent": true },
+          { "label": "office use only", "x": 10, "y": 1, "w": 2, "h": 9 }
+        ]
+      }
+    },
+    {
+      "id": "challenger-coupon-wallet",
+      "label": "Coupon Wallet",
+      "verdict": "competitive",
+      "lineage": "jet-age airline ticket wallets",
+      "thesis": "Each section is a carbon-copy coupon; checks stamp themselves on the coupon and nothing disappears.",
+      "palette": ["#1d2b53", "#c8102e", "#ffffff", "#5b3f8c"],
+      "materials": ["coupon stock", "carbon numerals", "void stamp"],
+      "viewport": "Contact, career and skills as tabbed coupons beside the original, missing details stamped NOT GIVEN.",
+      "case": "Fuses cleanly and states missing data most plainly; recruiters do not identify with air travel.",
+      "risk": "Reads as travel novelty if the stamps turn decorative.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-jet-age-ticket-wallet-hero.webp"
+    },
+    {
+      "id": "challenger-centre-rail",
+      "label": "Centre-Rail Edition",
+      "verdict": "competitive",
+      "lineage": "wide-margin reference editions",
+      "thesis": "Original and record set as twin columns around a rail of keys linking each source line to its field.",
+      "palette": ["#1a1a1a", "#c0392b", "#e6e8e4"],
+      "materials": ["ruling-engine hairlines", "small-caps apparatus"],
+      "viewport": "Original left, record right, a centre rail of keys joining them, flags hanging in the outer margin.",
+      "case": "Strongest verification mechanism; a scholarly edition is far from a recruiter's world.",
+      "risk": "Scholarly and slow for a fast screening pass.",
+      "hero": "https://impeccable.style/worlds/cards/rw-centre-rail-reference-setting-hero.webp"
+    },
+    {
+      "id": "challenger-split-flap",
+      "label": "Split-Flap Board",
+      "verdict": "declined",
+      "lineage": "rail concourse departure boards",
+      "thesis": "Fields as rows of flaps that cascade into place.",
+      "palette": ["#111111", "#ffffff", "#f2a900", "#8c1d18"],
+      "materials": ["matte flaps", "brushed steel"],
+      "viewport": "A board of candidate fields flipping into place.",
+      "case": "Fuses poorly: per-character flipping is a gimmick for a recruiter.",
+      "kept": "Columns never move; only their contents change.",
+      "risk": "Playful where trust is needed.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-split-flap-concourse-hero.webp"
+    },
+    {
+      "id": "challenger-monochrome",
+      "label": "Monochrome Product",
+      "verdict": "declined",
+      "lineage": "monochrome software marketing",
+      "thesis": "One neutral scale and a single rationed accent.",
+      "palette": ["#fafafa", "#0a0a0a", "#4f46e5"],
+      "materials": ["neutral scale", "soft radial grounds"],
+      "viewport": "Claim-and-proof panels in a neutral grid.",
+      "case": "This is the generic SaaS look you ruled out.",
+      "kept": "The accent is rationed to a handful of uses.",
+      "risk": "Indistinguishable from any dashboard.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-monochrome-product-marketing-hero.webp"
+    },
+    {
+      "id": "challenger-goods-catalog",
+      "label": "Goods Catalog",
+      "verdict": "declined",
+      "lineage": "character goods catalogs",
+      "thesis": "Each candidate as a cast member with fixed personal furniture.",
+      "palette": ["#fde2e4", "#cde7f0", "#ffffff", "#ff5a5f"],
+      "materials": ["pastel grounds", "white keylines"],
+      "viewport": "A candidate card with a name plate and fixed fields.",
+      "case": "Playful; you ruled that out for HR.",
+      "kept": "Every record carries the same fixed slots in the same order.",
+      "risk": "Undermines trust in the data.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-character-goods-catalog-hero.webp"
+    },
+    {
+      "id": "challenger-orienteering",
+      "label": "Orienteering Map",
+      "verdict": "declined",
+      "lineage": "ISOM orienteering maps",
+      "thesis": "The career as a course run control to control over a map of years.",
+      "palette": ["#ffffff", "#a64ca6", "#b07a3a", "#3f8fd2"],
+      "materials": ["ISOM inks", "contour texture"],
+      "viewport": "Jobs as numbered legs over a terrain of years.",
+      "case": "Vivid for the timeline, but recruiters do not read maps.",
+      "kept": "One colour is reserved for the single concern that needs attention.",
+      "risk": "Decorative terrain over plain facts.",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map-hero.webp"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "code" },
+  "canon": true,
+  "canonCard": {
+    "label": "The ATS standard",
+    "thesis": "The applicant-tracking dashboard: candidate card, avatar, skill pills, done at full craft.",
+    "palette": ["#ffffff", "#111827", "#2563eb"],
+    "materials": ["clean grid", "soft cards"],
+    "viewport": "Candidate card on top, sections in cards below, original in a side drawer.",
+    "risk": "Indistinguishable from every ATS by design."
+  },
+  "steer": true
+}

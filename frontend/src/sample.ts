@@ -1,0 +1,32 @@
+// A fictional resume for demos, so nobody has to paste a real person's details.
+// Every name, company, email and number here is invented.
+
+export const SAMPLE_RESUME = `RIYA KULKARNI
+Data Analyst | Pune, India
+riya.kulkarni@example.com | +91 90000 12345 | linkedin.com/in/riya-kulkarni-example | github.com/riya-example
+
+SUMMARY
+Data analyst who turns retail and finance data into dashboards that teams use every week.
+
+EXPERIENCE
+Data Analyst, Northwind Retail, Pune (Mar 2023 - Present)
+- Built a Power BI sales dashboard used by 40 store managers
+- Cut monthly reporting time from 3 days to 4 hours with SQL automation
+Junior Analyst, Contoso Finance, Mumbai (Jul 2021 - Feb 2023)
+- Reconciled 12,000 transactions a month in Excel and Python
+Analytics Intern, Fabrikam Labs (Jan 2021 - Jun 2021)
+- Cleaned survey data for a customer churn study
+
+EDUCATION
+B.Sc. Statistics, Savitribai Phule Pune University, 2018 - 2021, CGPA 8.4
+
+SKILLS
+Python, SQL, Statistics, Data Visualisation | Power BI, Excel, Tableau | Communication, Teamwork
+
+PROJECTS
+Churn Radar - a customer churn dashboard built with Power BI and SQL
+
+CERTIFICATIONS
+Microsoft Power BI Data Analyst (PL-300), Microsoft, 2023
+
+LANGUAGES: English, Hindi, Marathi`;

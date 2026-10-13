@@ -1,0 +1,23 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Frontend
+node_modules/
+frontend/dist/
+coverage/
+
+# Crash dumps from Git Bash on Windows
+*.stackdump
+
+# Impeccable working files (comps, captures, local config)
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/config.local.json
+.impeccable/questions/

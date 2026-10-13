@@ -1,0 +1,204 @@
+/* What is set on the galley: the name, values, proof marks, career and the JSON view.
+   Imported before galley.css so the narrow-galley overrides there come last. */
+
+.candidate-name {
+  color: var(--ink);
+  font-size: clamp(2.25rem, 1.2rem + 3vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.lead {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 1.15rem;
+  font-style: italic;
+}
+
+.field-value {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+a.field-value {
+  text-decoration: underline;
+  text-decoration-color: var(--hair);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 150ms ease-out;
+}
+
+a.field-value:hover {
+  text-decoration-color: var(--ink);
+}
+
+/* Proof mark for a malformed detail: underlined in red and queried in the margin. */
+.is-queried {
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+}
+
+/* Proof mark for a missing detail: a caret where it belongs and a line out to the
+   margin, where the query is written. The empty slot stays printed. */
+.slot {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 3rem;
+  height: 1.6rem;
+  margin-right: -1.25rem;
+  color: var(--red);
+}
+
+.caret {
+  flex: none;
+}
+
+.slot-line {
+  flex: 1;
+  margin-left: 0.2rem;
+  border-top: 1px solid currentColor;
+}
+
+.none-listed {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* The tally bracket: a blue proof bracket gathering the roles the code added up. */
+.bracket {
+  position: absolute;
+  top: 4rem;
+  bottom: 0.75rem;
+  right: calc(var(--margin) + 0.45rem);
+  width: 0.55rem;
+  border: 1.5px solid var(--blue);
+  border-left: 0;
+  pointer-events: none;
+}
+
+.tally-figure {
+  margin-block: 0.15rem 0.3rem;
+  font-size: 1.9rem;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.career-figure {
+  padding-right: 1.75rem;
+}
+
+.career-strip {
+  --lane-height: 1.65rem;
+  position: relative;
+  height: calc(var(--lanes) * var(--lane-height));
+}
+
+.career-bar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  min-width: 3px;
+  height: calc(var(--lane-height) - 0.3rem);
+  padding-inline: 0.4rem;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--sheet);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.career-bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.career-axis {
+  position: relative;
+  height: 1.5rem;
+  margin-top: 0.3rem;
+  border-top: 1px solid var(--ink);
+  color: var(--muted);
+  font: 400 0.72rem/1 var(--font-typed);
+}
+
+.career-axis span {
+  position: absolute;
+  top: 0;
+  padding: 0.35rem 0 0 0.3rem;
+  border-left: 1px solid var(--ink);
+}
+
+.job-when {
+  font-variant-numeric: tabular-nums;
+}
+
+.job-role {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.career .gl-value {
+  padding-right: 1.75rem;
+}
+
+.highlights {
+  margin-top: 0.35rem;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.highlights li::marker {
+  color: var(--hair);
+}
+
+.highlights li + li {
+  margin-top: 0.2rem;
+}
+
+.blank-copy {
+  max-width: 62ch;
+  margin-top: 0.6rem;
+  color: var(--muted);
+}
+
+.skeleton {
+  display: block;
+  height: 0.9rem;
+  margin-block: 0.35rem;
+  background: var(--faint);
+}
+
+.notice-title {
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.json-view {
+  max-height: 46rem;
+  overflow: auto;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--hair);
+  background: var(--sheet);
+  color: var(--ink);
+  font: 400 0.85rem/1.65 var(--font-typed);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.json-key,
+.json-literal {
+  color: var(--muted);
+}
+
+.json-number {
+  font-weight: 700;
+}
