@@ -2,6 +2,8 @@
 @import "./desk.css";
 @import "./lines.css";
 @import "./galley.css";
+@import "./portal.css";
+@import "./review.css";
 
 /* Galley proof. Cool galley stock and black type, with two proof pencils that each have
    one job: blue marks what code worked out, red marks what the recruiter must query and

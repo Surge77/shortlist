@@ -45,6 +45,7 @@ export function makeCandidate(overrides: Partial<Candidate> = {}): Candidate {
     certifications: [{ name: "PL-300", issuer: "Microsoft", year: "2023" }],
     achievements: [],
     languages: ["English", "Hindi", "Marathi"],
+    has_hidden_instructions: false,
     ...overrides,
   };
 }

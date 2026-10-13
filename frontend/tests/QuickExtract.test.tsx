@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as api from "../src/api";
-import { App } from "../src/App";
+import { QuickExtract } from "../src/pages/hr/QuickExtract";
 import { SAMPLE_RESUME } from "../src/sample";
 import { makeCandidate, makeResponse } from "./fixtures";
 
@@ -20,14 +20,14 @@ afterEach(() => {
 
 async function extractSample() {
   const user = userEvent.setup();
-  render(<App />);
+  render(<QuickExtract />);
   await user.click(screen.getByRole("button", { name: "Try a sample resume" }));
   await user.click(screen.getByRole("button", { name: "Extract details" }));
   await screen.findByRole("heading", { name: "Riya Kulkarni" });
   return user;
 }
 
-describe("App", () => {
+describe("QuickExtract", () => {
   it("extracts the sample resume and shows the candidate's record", async () => {
     await extractSample();
 
@@ -90,7 +90,7 @@ describe("App", () => {
 
   it("ignores a file dropped while a resume is being read", () => {
     extractResume.mockReturnValue(new Promise(() => {}));
-    render(<App />);
+    render(<QuickExtract />);
     fireEvent.click(screen.getByRole("button", { name: "Try a sample resume" }));
     fireEvent.click(screen.getByRole("button", { name: "Extract details" }));
     fireEvent.click(screen.getByRole("tab", { name: "Upload a file" }));
@@ -103,7 +103,7 @@ describe("App", () => {
 
   it("uploads a chosen file", async () => {
     const user = userEvent.setup();
-    render(<App />);
+    render(<QuickExtract />);
     const file = new File(["%PDF-1.7"], "riya.pdf", { type: "application/pdf" });
 
     await user.upload(screen.getByLabelText("Resume file"), file);
@@ -115,7 +115,7 @@ describe("App", () => {
 
   it("refuses an unsupported file before uploading it", async () => {
     const user = userEvent.setup({ applyAccept: false });
-    render(<App />);
+    render(<QuickExtract />);
 
     await user.upload(screen.getByLabelText("Resume file"), new File(["x"], "cv.doc"));
 
@@ -159,7 +159,7 @@ describe("App", () => {
   it("says so when the document is not a resume", async () => {
     extractResume.mockResolvedValue({ ok: true, data: makeResponse({ candidate: makeCandidate({ is_resume: false }) }) });
     const user = userEvent.setup();
-    render(<App />);
+    render(<QuickExtract />);
     await user.click(screen.getByRole("button", { name: "Try a sample resume" }));
     await user.click(screen.getByRole("button", { name: "Extract details" }));
 
@@ -169,7 +169,7 @@ describe("App", () => {
   it("retries the same resume after an error", async () => {
     extractResume.mockResolvedValueOnce({ ok: false, message: "Gemini is unavailable right now." });
     const user = userEvent.setup();
-    render(<App />);
+    render(<QuickExtract />);
     await user.click(screen.getByRole("button", { name: "Try a sample resume" }));
     await user.click(screen.getByRole("button", { name: "Extract details" }));
 

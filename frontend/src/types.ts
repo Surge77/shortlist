@@ -61,6 +61,7 @@ export interface Candidate {
   certifications: Certification[];
   achievements: string[];
   languages: string[];
+  has_hidden_instructions: boolean;
 }
 
 export interface ExtractResponse {

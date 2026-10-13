@@ -1,0 +1,232 @@
+/* The portal pages share the galley's rules: hairlines, no radius, one ink, blue for what
+   code worked out and red only for what HR must query. */
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+}
+
+.nav-link {
+  padding-block: 0.25rem;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-weight: 600;
+  transition: color 150ms ease-out;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+}
+
+.nav-link[aria-current="page"] {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+}
+
+.slug-user {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.page {
+  width: min(100% - 2rem, 72rem);
+  margin-inline: auto;
+  padding-block: 2rem 3rem;
+}
+
+.page-wide {
+  width: min(100% - 2rem, 92rem);
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--ink);
+}
+
+.page-kicker {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  color: var(--ink);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.section-title {
+  margin-bottom: 0.75rem;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.sheet {
+  padding: 1.5rem;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.stack {
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+}
+
+.two-column {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  .two-column {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
+    align-items: start;
+  }
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.ruled-list > li {
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--hair);
+}
+
+.row-title {
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 150ms ease-out;
+}
+
+.row-title:hover {
+  text-decoration-color: var(--ink);
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tag-ink {
+  color: var(--ink);
+}
+
+.tag-blue {
+  color: var(--blue);
+}
+
+.tag-red {
+  color: var(--red);
+}
+
+.tag-muted {
+  color: var(--muted);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field-label {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.field-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--hair);
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  border-color: var(--ink);
+  outline-offset: 0;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 48rem) {
+  .form-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.notice {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--hair);
+  background: var(--sheet);
+  color: var(--text);
+}
+
+.notice-error {
+  border-color: var(--red);
+}
+
+.prose {
+  color: var(--text);
+  white-space: pre-wrap;
+}
