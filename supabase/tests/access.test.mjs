@@ -239,3 +239,9 @@ test("browser roles hold no truncate privilege", async () => {
   const db = await freshDb();
   await assert.rejects(as(db, HR, "truncate public.notes"), /permission denied/);
 });
+
+test("signed-out visitors cannot call is_hr", async () => {
+  const db = await freshDb();
+  await assert.rejects(as(db, null, "select public.is_hr()"), /permission denied/);
+  assert.deepEqual(await as(db, HR, "select public.is_hr() as hr"), [{ hr: true }]);
+});

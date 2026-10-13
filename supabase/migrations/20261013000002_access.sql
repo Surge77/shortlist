@@ -125,6 +125,9 @@ end;
 $$;
 
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
+-- Policies call is_hr() as the signed-in user, so authenticated keeps it; no anon policy uses it.
+revoke execute on function public.is_hr() from public, anon;
+grant execute on function public.is_hr() to authenticated;
 revoke execute on function public.withdraw_application(uuid) from public, anon;
 revoke execute on function public.set_application_stage(uuid, public.application_stage) from public, anon;
 grant execute on function public.withdraw_application(uuid) to authenticated;
