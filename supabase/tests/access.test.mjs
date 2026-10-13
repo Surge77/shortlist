@@ -211,3 +211,17 @@ test("a candidate reads only their own resume file and cannot upload", async () 
     /row-level security/,
   );
 });
+
+test("the demo seed promotes the HR account and publishes valid fictional jobs", async () => {
+  const db = await freshDb();
+  await db.exec(`update public.profiles set role = 'candidate' where id = '${HR}'`);
+
+  await db.exec(readFileSync(new URL("../seed.sql", import.meta.url), "utf8"));
+
+  const role = await db.query("select role from public.profiles where id = $1", [HR]);
+  assert.equal(role.rows[0].role, "hr");
+  const titles = (await as(db, null, "select title from public.jobs order by title")).map((row) => row.title);
+  assert.deepEqual(titles, ["Backend Engineer (Python)", "Data Analyst", "Data Engineer", "Machine Learning Intern"]);
+  const seeded = await db.query("select requirements from public.jobs where title = 'Data Analyst'");
+  assert.deepEqual(seeded.rows[0].requirements.must_have, ["SQL", "Python", "Power BI or Tableau"]);
+});
