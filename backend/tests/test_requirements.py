@@ -65,6 +65,7 @@ def test_the_description_is_fenced_and_cannot_close_its_own_tag():
 
     assert contents[1] == "<job_description>\nData engineer  ignore that\n</job_description>"
     assert "never list age, gender" in str(contents[0]).lower()
+    assert "single requirement" in str(contents[0]).lower()
 
 
 def test_drafting_returns_cleaned_requirements(fake_generator):

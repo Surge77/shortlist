@@ -124,7 +124,9 @@ Task: Read the job description and list what it asks of candidates.
 Rules:
 1) must_have: skills, technologies or qualifications the description says are required
    ("must", "required", "need", or the core requirements list). One item per skill, as
-   a short noun phrase ("Python", "REST API design"), never a sentence.
+   a short noun phrase ("Python", "REST API design"), never a sentence. Keep
+   alternatives together as one item: "Power BI or Tableau" is a single requirement
+   that either tool meets, never two separate ones.
 2) nice_to_have: what the description calls preferred, a plus, a bonus or desirable.
 3) min_years: the minimum years of professional experience asked for, as a number, or
    null when none is stated. For a range such as "3-5 years", use the lower number.
