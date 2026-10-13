@@ -63,8 +63,9 @@ async def process_new(application_id: str, source: ResumeSource, job: Job, repo:
         await _extract_and_score(application_id, source, job, repo, generator)
     except UserFacingError as exc:
         await _record_failure(application_id, repo, exc.user_message)
-    except Exception:  # background-task boundary: nobody else will see this exception
-        logger.exception("Processing application %s failed", application_id)
+    except Exception as exc:  # background-task boundary: nobody else will see this exception
+        # Type only: a traceback of a validation error can quote resume text.
+        logger.error("Processing application %s failed: %s", application_id, type(exc).__name__)
         await _record_failure(application_id, repo, UNEXPECTED)
 
 
@@ -85,12 +86,19 @@ async def rescore(application_id: str, repo: Repository, generator: JsonGenerato
         await _extract_and_score(application_id, source, job, repo, generator)
     except UserFacingError as exc:
         await _record_failure(application_id, repo, exc.user_message)
-    except Exception:  # background-task boundary
-        logger.exception("Rescoring application %s failed", application_id)
+    except Exception as exc:  # background-task boundary
+        logger.error("Rescoring application %s failed: %s", application_id, type(exc).__name__)
         await _record_failure(application_id, repo, UNEXPECTED)
 
 
 async def rescore_all(application_ids: list[str], repo: Repository, generator: JsonGenerator) -> None:
     # One at a time: a job's applications in parallel would trip Gemini's rate limit.
     for application_id in application_ids:
+        # Marked here rather than in the route: a failed status write there would leave
+        # earlier rows "processing" with no task coming to score them.
+        try:
+            await repo.set_processing(application_id, "processing")
+        except UserFacingError:
+            logger.error("Could not mark application %s for rescoring", application_id)
+            continue
         await rescore(application_id, repo, generator)

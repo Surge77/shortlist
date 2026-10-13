@@ -4,6 +4,7 @@ import pytest
 
 from app.matching import MatchReply, MatchVerdict
 from app.requirements import JobRequirements
+from app.supabase_rest import SupabaseError
 from tests.factories import a_candidate, docx_bytes
 from tests.fakes import ALICE_ID, ALICE_TOKEN, BOB_TOKEN, DRAFT_JOB_ID, OPEN_JOB_ID, auth
 from tests.test_documents import PDF, PNG
@@ -152,3 +153,15 @@ def test_candidates_cannot_rescore(client, fake_generator, open_job):
 
 def test_rescoring_an_unknown_application_is_404(client):
     assert client.post("/api/applications/20000000-0000-4000-8000-00000000ffff/rescore").status_code == 404
+
+
+def test_any_failed_insert_removes_the_uploaded_file(client, fake_repo, open_job, monkeypatch):
+    async def database_down(_application):
+        raise SupabaseError()
+
+    monkeypatch.setattr(fake_repo, "create_application", database_down)
+
+    response = apply(client)
+
+    assert response.status_code == 502
+    assert fake_repo.files == {}

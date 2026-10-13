@@ -44,8 +44,18 @@ FILE_POINTER = "The resume is the attached file."
 RESUME_TAG = re.compile(r"</?resume>", re.IGNORECASE)
 
 
+def strip_tags(pattern: re.Pattern[str], text: str) -> str:
+    """Removes the tags until none are left: one pass over "</rec</record>ord>" leaves
+    "</record>" behind, which would close the block early."""
+    while True:
+        cleaned = pattern.sub("", text)
+        if cleaned == text:
+            return cleaned
+        text = cleaned
+
+
 def build_contents(source: ResumeSource) -> list[Content]:
     if source.blob is not None:
         return [EXTRACTION_PROMPT, FILE_POINTER, source.blob]
-    text = RESUME_TAG.sub("", source.text or "")
+    text = strip_tags(RESUME_TAG, source.text or "")
     return [EXTRACTION_PROMPT, f"<resume>\n{text}\n</resume>"]

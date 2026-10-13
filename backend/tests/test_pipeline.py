@@ -116,3 +116,34 @@ def test_rescore_all_goes_through_each_application(fake_generator):
     asyncio.run(pipeline.rescore_all([APP_ID], repo, fake_generator))
 
     assert repo.processing[APP_ID] == ("scored", None)
+
+
+def test_rescore_all_marks_each_application_and_skips_one_it_cannot_mark(fake_generator, monkeypatch):
+    repo, _ = setup()
+    repo.extractions[APP_ID] = StoredExtraction(a_candidate(), 24, [], [], None)
+    calls: list[str] = []
+    original = repo.set_processing
+
+    async def flaky(application_id, status, error=None):
+        calls.append(status)
+        if application_id == "gone":
+            raise SupabaseError()
+        await original(application_id, status, error)
+
+    monkeypatch.setattr(repo, "set_processing", flaky)
+    fake_generator.replies.append(sql_met())
+
+    asyncio.run(pipeline.rescore_all(["gone", APP_ID], repo, fake_generator))
+
+    assert calls == ["processing", "processing", "scored"]
+    assert repo.processing[APP_ID] == ("scored", None)
+
+
+def test_unexpected_failures_are_logged_without_their_details(fake_generator, caplog):
+    repo, job = setup()
+    fake_generator.replies.append(RuntimeError("resume text: Asha Verma, 98765 43210"))
+
+    asyncio.run(pipeline.process_new(APP_ID, from_text("resume"), job, repo, fake_generator))
+
+    assert "RuntimeError" in caplog.text
+    assert "Asha" not in caplog.text

@@ -96,10 +96,12 @@ async def apply(
             id=application_id, job_id=job.id, candidate_id=user.id, resume_path=path,
             resume_sha256=hashlib.sha256(data).hexdigest(), source_type=source.source_type, cover_note=note,
         ))
-    except DuplicateRow as exc:
-        # A second tab won the race between the check above and this insert.
+    except UserFacingError as exc:
+        # No row points at the file now, so it would sit in the bucket unowned.
         await repo.delete_resume(path)
-        raise AlreadyApplied() from exc
+        if isinstance(exc, DuplicateRow):  # a second tab won the race with the check above
+            raise AlreadyApplied() from exc
+        raise
 
     background.add_task(pipeline.process_new, application_id, source, job, repo, generator)
     return Applied(id=application_id)

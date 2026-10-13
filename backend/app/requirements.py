@@ -10,6 +10,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.gemini import Content, JsonGenerator
+from app.prompts import strip_tags
 
 EducationLevel = Literal["high_school", "diploma", "bachelor", "master", "doctorate"]
 
@@ -120,7 +121,7 @@ JD_TAG = re.compile(r"</?job_description>", re.IGNORECASE)
 
 
 def build_draft_contents(description: str) -> list[Content]:
-    text = JD_TAG.sub("", description.strip())
+    text = strip_tags(JD_TAG, description.strip())
     return [DRAFT_PROMPT, f"<job_description>\n{text}\n</job_description>"]
 
 

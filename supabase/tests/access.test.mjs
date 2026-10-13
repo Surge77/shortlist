@@ -225,3 +225,17 @@ test("the demo seed promotes the HR account and publishes valid fictional jobs",
   const seeded = await db.query("select requirements from public.jobs where title = 'Data Analyst'");
   assert.deepEqual(seeded.rows[0].requirements.must_have, ["SQL", "Python", "Power BI or Tableau"]);
 });
+
+test("hr cannot create a job that skips the draft step or carries unvalidated requirements", async () => {
+  const db = await freshDb();
+  await assert.rejects(
+    as(db, HR, `insert into public.jobs (title, description, status, requirements)
+                values ('Sneaky', '${DESCRIPTION}', 'open', '{"must_have": 5}')`),
+    /permission denied/,
+  );
+});
+
+test("browser roles hold no truncate privilege", async () => {
+  const db = await freshDb();
+  await assert.rejects(as(db, HR, "truncate public.notes"), /permission denied/);
+});

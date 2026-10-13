@@ -47,7 +47,5 @@ async def rescore_job(job_id: UUID, _: HrUser, repo: Repo, generator: Generator,
     if job is None:
         raise JobNotFound()
     ids = await repo.list_application_ids(job.id)
-    for application_id in ids:
-        await repo.set_processing(application_id, "processing")
     background.add_task(pipeline.rescore_all, ids, repo, generator)
     return RescoreQueued(requirements_version=job.requirements_version, queued=len(ids))

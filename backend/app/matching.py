@@ -15,6 +15,7 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 from app.gemini import Content, JsonGenerator
+from app.prompts import strip_tags
 from app.requirements import JobRequirements
 from app.schemas import Candidate
 
@@ -53,6 +54,9 @@ class CheckedVerdict:
     evidence: str | None
     # The model claimed evidence that is not in the record, so the verdict was dropped.
     unverified: bool
+    # The quote appears only in the skills list, not in any job, project or degree. Still
+    # evidence, but a keyword anyone can type; HR sees it marked rather than hidden.
+    skills_only: bool = False
 
 
 def build_checklist(requirements: JobRequirements) -> list[ChecklistItem]:
@@ -134,8 +138,15 @@ Rules:
 
 def build_match_contents(checklist: list[ChecklistItem], record: dict[str, Any]) -> list[Content]:
     lines = "\n".join(json.dumps({"requirement_id": item.id, "requirement": item.text}) for item in checklist)
-    record_json = PROMPT_TAGS.sub("", json.dumps(record, ensure_ascii=False))
-    return [MATCH_PROMPT, f"<checklist>\n{PROMPT_TAGS.sub('', lines)}\n</checklist>", f"<record>\n{record_json}\n</record>"]
+    record_json = strip_tags(PROMPT_TAGS, json.dumps(record, ensure_ascii=False))
+    checklist_text = strip_tags(PROMPT_TAGS, lines)
+    return [MATCH_PROMPT, f"<checklist>\n{checklist_text}\n</checklist>", f"<record>\n{record_json}\n</record>"]
+
+
+def only_in_skills(quote: str, record: dict[str, Any]) -> bool:
+    other_sections = {key: value for key, value in record.items() if key != "skills"}
+    in_skills = is_in_record(quote, normalize(record_text({"skills": record.get("skills")})))
+    return in_skills and not is_in_record(quote, normalize(record_text(other_sections)))
 
 
 def check_verdicts(checklist: list[ChecklistItem], reply: MatchReply, record: dict[str, Any]) -> list[CheckedVerdict]:
@@ -150,7 +161,9 @@ def check_verdicts(checklist: list[ChecklistItem], reply: MatchReply, record: di
         if answer is None or answer.verdict == "missing":
             checked.append(CheckedVerdict(item, "missing", None, unverified=False))
         elif answer.evidence and is_in_record(answer.evidence, haystack):
-            checked.append(CheckedVerdict(item, answer.verdict, answer.evidence.strip(), unverified=False))
+            evidence = answer.evidence.strip()
+            checked.append(CheckedVerdict(item, answer.verdict, evidence, unverified=False,
+                                          skills_only=only_in_skills(evidence, record)))
         else:
             checked.append(CheckedVerdict(item, "missing", None, unverified=True))
     return checked

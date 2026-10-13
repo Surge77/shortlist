@@ -50,6 +50,7 @@ class RequirementResult(BaseModel):
     verdict: Verdict
     evidence: str | None
     unverified: bool
+    skills_only: bool = False
 
 
 class CategoryResult(BaseModel):
@@ -140,7 +141,7 @@ def compute_score(
 ) -> ScoreResult:
     results = [
         RequirementResult(id=v.item.id, category=v.item.category, text=v.item.text, verdict=v.verdict,
-                          evidence=v.evidence, unverified=v.unverified)
+                          evidence=v.evidence, unverified=v.unverified, skills_only=v.skills_only)
         for v in verdicts
     ]
 

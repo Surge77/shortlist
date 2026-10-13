@@ -15,8 +15,14 @@ grant select on public.jobs to anon;
 revoke insert, update, delete on public.profiles from authenticated;
 grant update (full_name) on public.profiles to authenticated;
 
-revoke update on public.jobs from authenticated;
+-- Requirements and weights are written only by the API, which validates them; a job is
+-- always created as a draft and opened through an update the check constraint guards.
+revoke insert, update on public.jobs from authenticated;
+grant insert (title, department, location, employment_type, description, created_by) on public.jobs to authenticated;
 grant update (title, department, location, employment_type, description, status) on public.jobs to authenticated;
+
+-- PostgREST never issues these, but nothing in the browser should hold them either.
+revoke truncate, references, trigger on all tables in schema public from anon, authenticated;
 
 revoke insert, update, delete on public.applications, public.extractions, public.scores, public.stage_events
   from authenticated;
