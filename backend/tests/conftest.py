@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from app.documents import FileBlob
 from app.gemini import Content, get_generator
 from app.main import app
+from app.rate_limit import APPLY_LIMIT, GEMINI_HR_LIMIT
 from app.repository import get_repository
 from tests.fakes import HR_TOKEN, FakeRepository
 
@@ -39,6 +40,13 @@ class FakeGenerator:
 @pytest.fixture
 def fake_generator() -> FakeGenerator:
     return FakeGenerator()
+
+
+@pytest.fixture(autouse=True)
+def fresh_rate_limits() -> Iterator[None]:
+    yield
+    APPLY_LIMIT._calls.clear()
+    GEMINI_HR_LIMIT._calls.clear()
 
 
 @pytest.fixture

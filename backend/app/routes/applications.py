@@ -13,6 +13,7 @@ from app.auth import CandidateUser, HrUser, Repo
 from app.documents import MAX_UPLOAD_BYTES, InputProblem, ResumeSource, from_upload
 from app.errors import UserFacingError
 from app.gemini import JsonGenerator, get_generator
+from app.rate_limit import APPLY_LIMIT, GEMINI_HR_LIMIT
 from app.repository import NewApplication
 from app.supabase_rest import DuplicateRow
 
@@ -75,6 +76,7 @@ async def apply(
     file: Annotated[UploadFile, File()],
     cover_note: Annotated[str | None, Form()] = None,
 ) -> Applied:
+    APPLY_LIMIT.check(user.id)
     job = await repo.get_job(str(job_id))
     if job is None or job.status != "open" or job.requirements is None:
         raise JobNotOpen()
@@ -108,8 +110,9 @@ async def apply(
 
 
 @router.post("/applications/{application_id}/rescore", response_model=Queued, status_code=202)
-async def rescore_application(application_id: UUID, _: HrUser, repo: Repo, generator: Generator,
+async def rescore_application(application_id: UUID, user: HrUser, repo: Repo, generator: Generator,
                               background: BackgroundTasks) -> Queued:
+    GEMINI_HR_LIMIT.check(user.id)
     application = await repo.get_application(str(application_id))
     if application is None:
         raise ApplicationNotFound()

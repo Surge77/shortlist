@@ -1,0 +1,14 @@
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.coverage
+frontend/dist
+frontend/coverage
+supabase/tests/node_modules
+.git
+.impeccable
+**/*.stackdump
+# Secrets come from the platform's variables, never from files in the image.
+**/.env
+**/.env.*

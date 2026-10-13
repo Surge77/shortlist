@@ -9,6 +9,7 @@ from app import pipeline
 from app.auth import HrUser, Repo
 from app.errors import UserFacingError
 from app.gemini import JsonGenerator, get_generator
+from app.rate_limit import GEMINI_HR_LIMIT
 from app.requirements import DraftRequest, JobRequirements, RequirementsSaved, RequirementsUpdate, draft_requirements
 
 Generator = Annotated[JsonGenerator, Depends(get_generator)]
@@ -26,7 +27,8 @@ class RescoreQueued(RequirementsSaved):
 
 
 @router.post("/requirements/draft", response_model=JobRequirements)
-async def draft(body: DraftRequest, _: HrUser, generator: Generator) -> JobRequirements:
+async def draft(body: DraftRequest, user: HrUser, generator: Generator) -> JobRequirements:
+    GEMINI_HR_LIMIT.check(user.id)
     return await draft_requirements(body.description, generator)
 
 
@@ -41,8 +43,9 @@ async def save(job_id: UUID, body: RequirementsUpdate, _: HrUser, repo: Repo) ->
 
 
 @router.post("/jobs/{job_id}/rescore", response_model=RescoreQueued, status_code=202)
-async def rescore_job(job_id: UUID, _: HrUser, repo: Repo, generator: Generator,
+async def rescore_job(job_id: UUID, user: HrUser, repo: Repo, generator: Generator,
                       background: BackgroundTasks) -> RescoreQueued:
+    GEMINI_HR_LIMIT.check(user.id)
     job = await repo.get_job(str(job_id))
     if job is None:
         raise JobNotFound()
