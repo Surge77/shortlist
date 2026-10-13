@@ -56,6 +56,12 @@
   }
 }
 
+/* Inside a .page container, which already sets the width and gutters. */
+.desk-embedded {
+  width: 100%;
+  padding-block: 0;
+}
+
 .manuscript-column {
   display: grid;
   gap: 1.5rem;
@@ -288,12 +294,9 @@
 .site-footer {
   width: min(100% - 2rem, 92rem);
   margin: 0 auto;
-  padding-block: 1rem 2rem;
+  padding-block: 1.25rem 1.75rem;
   border-top: 1px solid var(--hair);
   color: var(--muted);
   font-size: 0.85rem;
-}
-
-.site-footer p {
-  max-width: 75ch;
+  text-align: center;
 }

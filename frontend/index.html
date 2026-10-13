@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Upload or paste a resume and get the candidate's details, ready for HR." />
+    <meta name="description" content="A hiring portal: candidates apply with a resume, HR reviews each application with an explainable fit score." />
     <title>Shortlist</title>
     <link
       rel="icon"
@@ -15,6 +15,13 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Hanken+Grotesk:ital,wght@0,400;0,600;0,700;0,800;1,400;1,500&display=swap"
     />
+    <style>
+      /* Desk colours from src/index.css, inlined so the first paint before the stylesheet
+         loads matches the theme instead of flashing white. */
+      html { background: #e6e8e3; }
+      @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) { background: #0f110f; } }
+      html[data-theme="dark"] { background: #0f110f; }
+    </style>
     <script>
       // Apply a saved theme before first paint so the page does not flash the other one.
       try {

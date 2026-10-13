@@ -55,7 +55,7 @@ export function ApplicationReview({ applicationId }: { applicationId: string }) 
       <p role="status" className="sr-only">
         {isProcessing(detail) ? "Scoring the resume." : detail.processing_status === "scored" ? "Score ready." : ""}
       </p>
-      <div className="desk p-0">
+      <div className="desk desk-embedded">
         <div className="manuscript-column">
           <ScoreArea detail={detail} onRescored={reload} />
           <DecisionPanel applicationId={detail.id} stage={detail.stage} onStageChanged={reload} />

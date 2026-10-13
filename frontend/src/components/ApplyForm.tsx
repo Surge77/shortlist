@@ -50,7 +50,10 @@ export function ApplyForm({ jobId }: { jobId: string }) {
   const isSending = phase.kind === "sending";
   return (
     <form className="form-grid" onSubmit={(event) => void submit(event)} noValidate>
-      <Field label="Resume" hint="PDF, Word (.docx), PNG, JPG or WebP, up to 5 MB.">
+      <Field
+        label="Resume"
+        hint="PDF, Word (.docx), PNG, JPG or WebP, up to 5 MB. Google Gemini reads it to help HR review your application."
+      >
         {(control) => (
           <input
             {...control}

@@ -67,10 +67,7 @@ export function App() {
           <CurrentPage />
         </div>
         <footer className="site-footer">
-          <p>
-            Scores assist HR; people decide. Gemini reads resumes and cites evidence, code checks every quote and adds up
-            the score. On Gemini's free tier, Google may use uploaded files, so use sample or consented resumes.
-          </p>
+          <p>Shortlist · Scores assist HR; people decide.</p>
         </footer>
       </div>
     </AuthProvider>
