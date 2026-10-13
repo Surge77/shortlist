@@ -7,7 +7,7 @@ import { ScorePanel } from "../../components/ScorePanel";
 import { StageTag } from "../../components/Tags";
 import { getApplicationDetail, resumeUrl } from "../../data/applications";
 import type { ApplicationDetail } from "../../data/types";
-import { blindRecord, candidateLabel, isStale } from "../../hr/applicants";
+import { blindRecord, candidateLabel, isProcessing, isStale, isStuck } from "../../hr/applicants";
 import { useBlindMode } from "../../hr/useBlindMode";
 import { usePolling } from "../../hr/usePolling";
 import { formatDate } from "../../labels";
@@ -24,7 +24,8 @@ export function toExtractResponse(detail: ApplicationDetail): ExtractResponse | 
 export function ApplicationReview({ applicationId }: { applicationId: string }) {
   const { state, reload } = useLoad(() => getApplicationDetail(applicationId), applicationId);
   const [isBlind, setIsBlind] = useBlindMode();
-  usePolling(state.status === "ready" && state.data?.processing_status === "processing", reload);
+  const isWaiting = state.status === "ready" && !!state.data && isProcessing(state.data) && !isStuck(state.data, Date.now());
+  usePolling(isWaiting, reload);
 
   if (state.status === "loading") return <div className="page meta">Loading application…</div>;
   if (state.status === "error") return <div className="page"><p className="notice notice-error">{state.message}</p></div>;
@@ -57,7 +58,8 @@ export function ApplicationReview({ applicationId }: { applicationId: string }) 
           {detail.cover_note && (
             <section className="sheet">
               <h2 className="section-title">Cover note</h2>
-              <p className="prose">{detail.cover_note}</p>
+              {/* Free text in the candidate's own words: it usually opens with their name. */}
+              {isBlind ? <p className="meta">Hidden in blind review.</p> : <p className="prose">{detail.cover_note}</p>}
             </section>
           )}
         </div>
@@ -85,7 +87,16 @@ function ScoreArea({ detail, onRescored }: { detail: ApplicationDetail; onRescor
   const rescoreButton = (
     <button type="button" className="btn-outline" onClick={() => void rescore()}>Rescore</button>
   );
-  if (detail.processing_status === "processing") {
+  if (isProcessing(detail) && isStuck(detail, Date.now())) {
+    return (
+      <div className="notice notice-error">
+        <p className="mb-3">Scoring has been running for over 5 minutes, so it has probably stopped.</p>
+        {rescoreButton}
+        {problem && <p className="problem" role="alert">{problem}</p>}
+      </div>
+    );
+  }
+  if (isProcessing(detail)) {
     return <p className="notice" role="status">Reading and scoring the resume… this takes about 20 seconds.</p>;
   }
   return (

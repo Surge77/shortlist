@@ -59,6 +59,7 @@ export interface RequirementResult {
   verdict: Verdict;
   evidence: string | null;
   unverified: boolean;
+  skills_only?: boolean;
 }
 
 export interface CategoryResult {
@@ -88,6 +89,7 @@ export interface Applicant {
   processing_status: ProcessingStatus;
   processing_error: string | null;
   created_at: string;
+  updated_at: string;
   full_name: string | null;
   score: Score | null;
 }

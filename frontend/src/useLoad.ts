@@ -22,10 +22,16 @@ export function useLoad<T>(loader: () => Promise<ApiResult<T>>, key: string): Lo
     loaderRef.current().then(
       (result) => {
         if (!isCurrent) return;
-        setState(result.ok ? { status: "ready", data: result.data } : { status: "error", message: result.message });
+        if (result.ok) setState({ status: "ready", data: result.data });
+        // A failed refresh keeps what is already on screen; only a first load shows the error.
+        else setState((previous) => (previous.status === "ready" ? previous : { status: "error", message: result.message }));
       },
       () => {
-        if (isCurrent) setState({ status: "error", message: "Something went wrong. Try again." });
+        if (isCurrent) {
+          setState((previous) =>
+            previous.status === "ready" ? previous : { status: "error", message: "Something went wrong. Try again." },
+          );
+        }
       },
     );
     return () => {

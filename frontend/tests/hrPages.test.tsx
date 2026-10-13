@@ -175,6 +175,9 @@ describe("application review", () => {
     expect(screen.queryByText("riya.kulkarni@example.com")).not.toBeInTheDocument();
     expect(screen.getByText("Scoring failed")).toBeInTheDocument();
     expect(screen.getByText("This file doesn't look like a resume.")).toBeInTheDocument();
+    expect(screen.getByText("Hidden in blind review.")).toBeInTheDocument();
+    // Let the notes panel finish loading before cleanup resets the mocks it calls.
+    expect(await screen.findByText("Strong SQL")).toBeInTheDocument();
   });
 });
 

@@ -20,8 +20,17 @@ export function one<T>(value: T | T[] | null | undefined): T | null {
 }
 
 const SIGNED_URL_SECONDS = 300;
+// Error codes raised deliberately by withdraw_application / set_application_stage, whose
+// messages are written for people; anything else may be an internal Postgres error.
+const OWN_ERROR_CODES = new Set(["P0001", "P0002", "42501"]);
+const STAGE_FAILED = "Couldn't update the application. Reload and try again.";
+
+export function stageError(error: { code?: string; message: string }): string {
+  return error.code && OWN_ERROR_CODES.has(error.code) ? error.message : STAGE_FAILED;
+}
+
 const APPLICANT_COLUMNS =
-  "id,stage,processing_status,processing_error,created_at,profiles(full_name),scores(total,band,breakdown,requirements_version)";
+  "id,stage,processing_status,processing_error,created_at,updated_at,profiles(full_name),scores(total,band,breakdown,requirements_version)";
 
 interface RawApplicant extends Omit<Applicant, "full_name" | "score"> {
   profiles: { full_name: string | null } | null;
@@ -44,7 +53,7 @@ export async function listMyApplications(): Promise<ApiResult<MyApplication[]>> 
 export async function withdrawApplication(id: string): Promise<ApiResult<null>> {
   if (!supabase) return { ok: false, message: NOT_CONFIGURED };
   const { error } = await supabase.rpc("withdraw_application", { application_id: id });
-  return error ? { ok: false, message: error.message } : { ok: true, data: null };
+  return error ? { ok: false, message: stageError(error) } : { ok: true, data: null };
 }
 
 export async function listApplicants(jobId: string): Promise<ApiResult<Applicant[]>> {
@@ -126,7 +135,7 @@ export async function listStageEvents(applicationId: string): Promise<ApiResult<
 export async function setStage(applicationId: string, stage: Stage): Promise<ApiResult<null>> {
   if (!supabase) return { ok: false, message: NOT_CONFIGURED };
   const { error } = await supabase.rpc("set_application_stage", { application_id: applicationId, new_stage: stage });
-  return error ? { ok: false, message: error.message } : { ok: true, data: null };
+  return error ? { ok: false, message: stageError(error) } : { ok: true, data: null };
 }
 
 export async function resumeUrl(path: string): Promise<ApiResult<string>> {

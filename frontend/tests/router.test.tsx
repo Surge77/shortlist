@@ -20,6 +20,7 @@ describe("router", () => {
     ["/hr", "/hr/", {}],
     ["/jobs/:id", "/jobs", null],
     ["/hr/jobs/:id", "/hr/apps/1", null],
+    ["/jobs/:id", "/jobs/%zz", null],
   ])("matches %s against %s", (pattern, path, expected) => {
     expect(matchPath(pattern, path)).toEqual(expected);
   });

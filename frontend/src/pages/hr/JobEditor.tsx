@@ -55,23 +55,38 @@ export function JobEditor({ jobId }: { jobId: string | null }) {
         </div>
         {job && <JobStatusTag status={job.status} />}
       </header>
-      <div className="stack">
-        {/* Remounted after each save so the form starts from what was stored. */}
-        <JobFieldsForm key={job?.id ?? "new"} job={job} onSaved={load.reload} />
-        {job && <RequirementBuilder job={job} onSaved={load.reload} />}
-        {job && <StatusControls job={job} onChanged={load.reload} />}
-      </div>
+      {/* Keyed by id: a new job's form is replaced by the saved job's form after creation. */}
+      <EditorSections key={job?.id ?? "new"} job={job} onChanged={load.reload} />
     </div>
   );
 }
 
-function JobFieldsForm({ job, onSaved }: { job: Job | null; onSaved: () => void }) {
+function EditorSections({ job, onChanged }: { job: Job | null; onChanged: () => void }) {
+  // Shared so "Draft from description" reads what HR is typing, not the last saved text.
+  const [description, setDescription] = useState(job?.description ?? "");
+  return (
+    <div className="stack">
+      <JobFieldsForm job={job} onSaved={onChanged} onDescriptionChange={setDescription} />
+      {job && <RequirementBuilder job={{ ...job, description }} onSaved={onChanged} />}
+      {job && <StatusControls job={job} onChanged={onChanged} />}
+    </div>
+  );
+}
+
+interface JobFieldsFormProps {
+  job: Job | null;
+  onSaved: () => void;
+  onDescriptionChange: (description: string) => void;
+}
+
+function JobFieldsForm({ job, onSaved, onDescriptionChange }: JobFieldsFormProps) {
   const [fields, setFields] = useState<JobFields>(job ?? EMPTY_FIELDS);
   const [problem, setProblem] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
 
   function set<K extends keyof JobFields>(key: K, value: JobFields[K]) {
     setFields({ ...fields, [key]: value });
+    if (key === "description") onDescriptionChange(value as string);
   }
 
   async function submit(event: FormEvent) {

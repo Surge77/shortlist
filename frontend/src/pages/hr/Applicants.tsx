@@ -9,6 +9,7 @@ import {
   candidateLabel,
   filterApplicants,
   isStale,
+  isStuck,
   knockoutCount,
   NO_FILTERS,
   sortApplicants,
@@ -34,9 +35,11 @@ function downloadCsv(filename: string, csv: string) {
 export function Applicants({ jobId }: { jobId: string }) {
   const job = useLoad(() => getJob(jobId), jobId);
   const applicants = useLoad(() => listApplicants(jobId), jobId);
-  const isProcessing =
-    applicants.state.status === "ready" && applicants.state.data.some((a) => a.processing_status === "processing");
-  usePolling(isProcessing, applicants.reload);
+  const now = Date.now();
+  const isWaiting =
+    applicants.state.status === "ready" &&
+    applicants.state.data.some((a) => a.processing_status === "processing" && !isStuck(a, now));
+  usePolling(isWaiting, applicants.reload);
 
   if (job.state.status === "loading") return <div className="page meta">Loading…</div>;
   if (job.state.status === "error") return <div className="page"><p className="notice notice-error">{job.state.message}</p></div>;
@@ -158,7 +161,8 @@ function ApplicantTable({ job, rows }: { job: Job; rows: Applicant[] }) {
                   <Link to={`/hr/applications/${row.id}`} className="row-title">{candidateLabel(row, isBlind)}</Link>
                 </td>
                 <td>
-                  <ScoreCell status={row.processing_status} score={row.score} error={row.processing_error} />
+                  <ScoreCell status={row.processing_status} score={row.score} error={row.processing_error}
+                    isStuck={isStuck(row, Date.now())} />
                   {isStale(row, job.requirements_version) && <span className="tag tag-muted ml-2">Old version</span>}
                 </td>
                 <td>{knockoutCount(row) > 0 ? <span className="tag tag-red">{knockoutCount(row)}</span> : <span className="meta">None</span>}</td>

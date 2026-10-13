@@ -1,5 +1,5 @@
 import type { Band, JobStatus, ProcessingStatus, Score, Stage } from "../data/types";
-import { BAND_LABEL, CANDIDATE_STAGE_LABEL, JOB_STATUS_LABEL, STAGE_LABEL } from "../labels";
+import { BAND_LABEL, CANDIDATE_STAGE_LABEL, formatScore, JOB_STATUS_LABEL, STAGE_LABEL } from "../labels";
 
 const STAGE_TONE: Record<Stage, string> = {
   submitted: "tag-muted",
@@ -29,16 +29,18 @@ interface ScoreCellProps {
   status: ProcessingStatus;
   score: Score | null;
   error: string | null;
+  isStuck?: boolean;
 }
 
 // What the applicant table shows in the score column for each processing state.
-export function ScoreCell({ status, score, error }: ScoreCellProps) {
+export function ScoreCell({ status, score, error, isStuck = false }: ScoreCellProps) {
+  if (status === "processing" && isStuck) return <span className="tag tag-red">Stuck: rescore</span>;
   if (status === "processing") return <span className="meta">Scoring…</span>;
   if (status === "failed") return <span className="tag tag-red" title={error ?? undefined}>Failed</span>;
   if (score?.total == null || !score.band) return <span className="meta">No score</span>;
   return (
     <span className="inline-flex items-center gap-2">
-      <strong className="text-ink">{score.total.toFixed(0)}</strong>
+      <strong className="text-ink">{formatScore(score.total)}</strong>
       <BandTag band={score.band} />
     </span>
   );

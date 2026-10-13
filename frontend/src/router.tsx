@@ -30,6 +30,15 @@ export function navigate(to: string, { replace = false } = {}): void {
   window.dispatchEvent(new Event(NAVIGATE_EVENT));
 }
 
+// A malformed escape ("/jobs/%zz") makes decodeURIComponent throw; treat it as no match.
+function safeDecode(value: string): string | null {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 // "/hr/jobs/:id" against "/hr/jobs/42" gives { id: "42" }; no match gives null.
 export function matchPath(pattern: string, path: string): Record<string, string> | null {
   const patternParts = pattern.split("/").filter(Boolean);
@@ -38,7 +47,11 @@ export function matchPath(pattern: string, path: string): Record<string, string>
   const params: Record<string, string> = {};
   for (const [index, part] of patternParts.entries()) {
     const value = pathParts[index];
-    if (part.startsWith(":")) params[part.slice(1)] = decodeURIComponent(value);
+    if (part.startsWith(":")) {
+      const decoded = safeDecode(value);
+      if (decoded === null) return null;
+      params[part.slice(1)] = decoded;
+    }
     else if (part !== value) return null;
   }
   return params;

@@ -155,6 +155,7 @@ describe("small rules", () => {
   it.each([
     ["/hr/jobs/1", "/hr/jobs/1"],
     ["//evil.example", null],
+    ["/\\evil.example", null],
     ["https://evil.example", null],
     [null, null],
   ])("only follows same-site next paths (%s)", (next, expected) => {

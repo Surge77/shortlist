@@ -28,6 +28,7 @@ export function makeApplicant(overrides: Partial<Applicant> = {}): Applicant {
     processing_status: "scored",
     processing_error: null,
     created_at: "2026-10-10T09:00:00Z",
+    updated_at: "2026-10-10T09:00:30Z",
     full_name: "Riya Kulkarni",
     score: makeScore(),
     ...overrides,

@@ -9,9 +9,9 @@ type Mode = "login" | "signup";
 type Phase = { kind: "editing"; problem: string | null } | { kind: "busy" } | { kind: "checkEmail" };
 
 // Only same-site paths are followed after sign-in, so a crafted link can't bounce
-// someone to another site ("//evil.example" is protocol-relative, hence the second check).
+// someone to another site. "//host" and "/\host" are both read by browsers as another host.
 export function safeNext(next: string | null): string | null {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+  return next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\") ? next : null;
 }
 
 export function AuthPage({ mode, next }: { mode: Mode; next: string | null }) {

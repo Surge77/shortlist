@@ -40,6 +40,12 @@ export const EDUCATION_LABEL: Record<EducationLevel, string> = {
   doctorate: "Doctorate",
 };
 
+// The band is decided on the one-decimal total, so show that total: "75" beside
+// "Possible fit" would read as a contradiction when the total is really 74.6.
+export function formatScore(total: number): string {
+  return Number.isInteger(total) ? String(total) : total.toFixed(1);
+}
+
 const DATE_FORMAT = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
 export function formatDate(iso: string): string {

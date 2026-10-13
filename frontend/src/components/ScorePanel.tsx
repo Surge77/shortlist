@@ -1,5 +1,5 @@
 import type { RequirementResult, Score, ScoreCategory } from "../data/types";
-import { VERDICT_LABEL } from "../labels";
+import { formatScore, VERDICT_LABEL } from "../labels";
 import { BandTag } from "./Tags";
 
 const VERDICT_MARK = { met: "✓", partial: "½", missing: "✕" } as const;
@@ -24,7 +24,7 @@ export function ScorePanel({ score }: { score: Score }) {
             <p className="meta">No score: the job has no requirements to score against.</p>
           ) : (
             <p>
-              <span className="score-figure">{score.total.toFixed(0)}</span>
+              <span className="score-figure">{formatScore(score.total)}</span>
               <span className="meta"> / 100</span>
             </p>
           )}
@@ -84,6 +84,7 @@ function RequirementList({ title, items }: { title: string; items: RequirementRe
               <span className={`sr-only`}>: {VERDICT_LABEL[item.verdict]}</span>
               {item.verdict === "partial" && <span className="meta"> (partly)</span>}
               {item.unverified && <span className="meta"> (claimed evidence not found in the resume)</span>}
+              {item.skills_only && <span className="meta"> (listed in skills only)</span>}
             </span>
             {item.evidence && <q className="evidence">{item.evidence}</q>}
           </li>

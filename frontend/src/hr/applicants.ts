@@ -30,6 +30,18 @@ export function isStale(applicant: Applicant, requirementsVersion: number): bool
   return applicant.score !== null && applicant.score.requirements_version < requirementsVersion;
 }
 
+// Scoring takes well under a minute; a row still "processing" after this long lost its
+// background task (a server restart, say) and needs HR to rescore it.
+export const STUCK_AFTER_MS = 5 * 60 * 1000;
+
+export function isProcessing(applicant: Pick<Applicant, "processing_status">): boolean {
+  return applicant.processing_status === "processing";
+}
+
+export function isStuck(applicant: Pick<Applicant, "processing_status" | "updated_at">, now: number): boolean {
+  return isProcessing(applicant) && now - new Date(applicant.updated_at).getTime() > STUCK_AFTER_MS;
+}
+
 export function filterApplicants(rows: Applicant[], filters: ApplicantFilters, isBlind: boolean): Applicant[] {
   const query = filters.query.trim().toLowerCase();
   return rows.filter((row) => {
@@ -84,8 +96,31 @@ export function applicantsCsv(rows: Applicant[], isBlind: boolean): string {
 // Warnings about contact details would give away that they were hidden, not missing.
 const CONTACT_WARNING = /email|phone|linkedin/i;
 
+// Same rule as backend/app/matching.py redact(): name parts this short ("Li") would blank
+// out ordinary words too.
+const MIN_NAME_PART_CHARS = 3;
+const REDACTED_NAME = "[candidate]";
+
+function namePattern(fullName: string | null): RegExp | null {
+  const parts = (fullName ?? "").split(/[^\p{L}\p{N}]+/u).filter((part) => part.length >= MIN_NAME_PART_CHARS);
+  if (parts.length === 0) return null;
+  const escaped = parts.map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(`(?<![\\p{L}\\p{N}])(${escaped.join("|")})(?![\\p{L}\\p{N}])`, "giu");
+}
+
+function redactStrings(value: unknown, pattern: RegExp): unknown {
+  if (typeof value === "string") return value.replace(pattern, REDACTED_NAME);
+  if (Array.isArray(value)) return value.map((item) => redactStrings(item, pattern));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactStrings(item, pattern)]));
+  }
+  return value;
+}
+
 export function blindRecord(result: ExtractResponse): ExtractResponse {
-  const { candidate } = result;
+  const pattern = namePattern(result.candidate.full_name);
+  // The summary, headline and job highlights often repeat the candidate's name.
+  const candidate = pattern ? (redactStrings(result.candidate, pattern) as ExtractResponse["candidate"]) : result.candidate;
   return {
     ...result,
     candidate: {

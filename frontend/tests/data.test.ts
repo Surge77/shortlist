@@ -119,10 +119,14 @@ describe("applications data", () => {
 
   it("changes stages through the audited functions", async () => {
     db.reply("rpc:set_application_stage", {});
-    db.reply("rpc:withdraw_application", { error: { message: "This application can no longer be withdrawn" } });
+    db.reply("rpc:withdraw_application", { error: { code: "P0001", message: "This application can no longer be withdrawn" } });
+    db.reply("rpc:set_application_stage", { error: { code: "22P02", message: 'invalid input syntax for type uuid: "x"' } });
 
     expect(await applications.setStage("a", "shortlisted")).toEqual({ ok: true, data: null });
     expect(await applications.withdrawApplication("a")).toEqual({ ok: false, message: "This application can no longer be withdrawn" });
+    // Errors the functions didn't raise on purpose never reach the screen verbatim.
+    const internal = await applications.setStage("x", "hired");
+    expect(internal.ok === false && internal.message).toBe("Couldn't update the application. Reload and try again.");
     expect(db.calls[0].steps[0][1]).toEqual([{ application_id: "a", new_stage: "shortlisted" }]);
   });
 

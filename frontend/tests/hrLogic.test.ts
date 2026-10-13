@@ -6,10 +6,13 @@ import {
   candidateLabel,
   filterApplicants,
   isStale,
+  isStuck,
   NO_FILTERS,
   sortApplicants,
   stageCounts,
+  STUCK_AFTER_MS,
 } from "../src/hr/applicants";
+import { formatScore } from "../src/labels";
 import { fromDraft, isEmpty, lines, toDraft, weightsProblem } from "../src/hr/requirementsForm";
 import { DEFAULT_WEIGHTS, EMPTY_REQUIREMENTS } from "../src/data/types";
 import { makeResponse } from "./fixtures";
@@ -100,5 +103,28 @@ describe("requirement form", () => {
     expect(weightsProblem(DEFAULT_WEIGHTS)).toBeNull();
     expect(weightsProblem({ ...DEFAULT_WEIGHTS, education: 1.5 })).toMatch(/whole number/);
     expect(weightsProblem({ must_have: 0, nice_to_have: 0, experience: 0, education: 0, certifications: 0 })).toMatch(/above zero/);
+  });
+});
+
+describe("review fixes", () => {
+  it("shows the score at the precision its band was decided on", () => {
+    expect(formatScore(74.6)).toBe("74.6");
+    expect(formatScore(80)).toBe("80");
+  });
+
+  it("treats processing older than five minutes as stuck", () => {
+    const started = Date.parse("2026-10-10T09:00:00Z");
+    const row = { processing_status: "processing" as const, updated_at: "2026-10-10T09:00:00Z" };
+    expect(isStuck(row, started + STUCK_AFTER_MS - 1)).toBe(false);
+    expect(isStuck(row, started + STUCK_AFTER_MS + 1)).toBe(true);
+    expect(isStuck({ ...row, processing_status: "scored" }, started + STUCK_AFTER_MS * 10)).toBe(false);
+  });
+
+  it("removes the candidate's name from free text in blind records", () => {
+    const result = makeResponse();
+    const named = { ...result, candidate: { ...result.candidate, full_name: "Riya Kulkarni",
+      summary: "Riya is a data analyst. KULKARNI built dashboards." } };
+
+    expect(blindRecord(named).candidate.summary).toBe("[candidate] is a data analyst. [candidate] built dashboards.");
   });
 });
