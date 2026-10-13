@@ -8,6 +8,8 @@ from pydantic import BaseModel
 from app.documents import FileBlob
 from app.gemini import Content, get_generator
 from app.main import app
+from app.repository import get_repository
+from tests.fakes import HR_TOKEN, FakeRepository
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
@@ -40,9 +42,17 @@ def fake_generator() -> FakeGenerator:
 
 
 @pytest.fixture
-def client(fake_generator: FakeGenerator) -> Iterator[TestClient]:
+def fake_repo() -> FakeRepository:
+    return FakeRepository()
+
+
+@pytest.fixture
+def client(fake_generator: FakeGenerator, fake_repo: FakeRepository) -> Iterator[TestClient]:
     app.dependency_overrides[get_generator] = lambda: fake_generator
+    app.dependency_overrides[get_repository] = lambda: fake_repo
     # The app only answers to localhost names, as a browser on this machine would send.
-    with TestClient(app, base_url="http://127.0.0.1") as test_client:
+    # Signed in as HR by default; tests about other callers pass their own header.
+    headers = {"Authorization": f"Bearer {HR_TOKEN}"}
+    with TestClient(app, base_url="http://127.0.0.1", headers=headers) as test_client:
         yield test_client
     app.dependency_overrides.clear()

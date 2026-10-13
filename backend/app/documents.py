@@ -12,6 +12,7 @@ import docx
 from docx.opc.exceptions import PackageNotFoundError
 from lxml.etree import XMLSyntaxError
 
+from app.errors import UserFacingError
 from app.schemas import SourceType
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
@@ -43,7 +44,7 @@ class ResumeSource:
     blob: FileBlob | None
 
 
-class InputProblem(Exception):
+class InputProblem(UserFacingError):
     status_code = 422
     user_message = "That input could not be used."
 
