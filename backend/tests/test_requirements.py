@@ -8,6 +8,7 @@ from app.requirements import (
     MAX_ITEMS,
     JobRequirements,
     RequirementsDraft,
+    RequirementsUpdate,
     Weights,
     build_draft_contents,
     clean_items,
@@ -74,3 +75,13 @@ def test_drafting_returns_cleaned_requirements(fake_generator):
     assert requirements.must_have == ["Python", "SQL"]
     assert requirements.education_level == "bachelor"
     assert "We need a Python and SQL engineer." in fake_generator.sent_text()
+
+
+def test_saving_needs_a_requirement_and_a_weight_on_a_category_the_job_asks_about():
+    assert RequirementsUpdate(requirements=JobRequirements(must_have=["SQL"])).weights == Weights()
+    with pytest.raises(ValidationError, match="at least one requirement"):
+        RequirementsUpdate(requirements=JobRequirements())
+    with pytest.raises(ValidationError, match="weight above zero"):
+        RequirementsUpdate(requirements=JobRequirements(must_have=["SQL"]), weights=Weights(must_have=0))
+    # Zeroing a category the job doesn't ask about is fine.
+    RequirementsUpdate(requirements=JobRequirements(must_have=["SQL"]), weights=Weights(experience=0))

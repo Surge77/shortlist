@@ -207,3 +207,22 @@ describe("app shell", () => {
     expect(await screen.findByText("No jobs are open right now. Check back soon.")).toBeInTheDocument();
   });
 });
+
+describe("data that depends on who is signed in", () => {
+  it("never shows the apply form to a candidate who already applied while their applications load", async () => {
+    as({ status: "loading" });
+    vi.mocked(jobs.getJob).mockResolvedValue({ ok: true, data: makeJobRow({ id: "j1" }) });
+    vi.mocked(applications.listMyApplications).mockResolvedValue({
+      ok: true,
+      data: [{ id: "a1", stage: "submitted", created_at: "2026-10-05T00:00:00Z", job: { id: "j1", title: "Data Engineer", location: null, status: "open" } }],
+    });
+    const { rerender } = visit("/jobs/j1");
+    await screen.findByRole("heading", { name: "Data Engineer" });
+
+    as(CANDIDATE);
+    rerender(<App />);
+
+    expect(screen.queryByRole("button", { name: "Send application" })).not.toBeInTheDocument();
+    expect(await screen.findByText(/You applied on/)).toBeInTheDocument();
+  });
+});

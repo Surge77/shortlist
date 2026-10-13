@@ -14,6 +14,7 @@ export interface Load<T> {
 export function useLoad<T>(loader: () => Promise<ApiResult<T>>, key: string): Load<T> {
   const [state, setState] = useState<Loaded<T>>({ status: "loading" });
   const [version, setVersion] = useState(0);
+  const [loadedKey, setLoadedKey] = useState(key);
   const loaderRef = useRef(loader);
   loaderRef.current = loader;
 
@@ -38,6 +39,13 @@ export function useLoad<T>(loader: () => Promise<ApiResult<T>>, key: string): Lo
       isCurrent = false;
     };
   }, [key, version]);
+
+  // Reset during render (React's documented pattern for state derived from a prop), so the
+  // previous key's data is never shown for the new key, not even for one frame.
+  if (loadedKey !== key) {
+    setLoadedKey(key);
+    setState({ status: "loading" });
+  }
 
   const reload = useCallback(() => setVersion((v) => v + 1), []);
   return { state, reload };

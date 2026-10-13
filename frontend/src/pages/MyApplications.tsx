@@ -67,7 +67,7 @@ function ApplicationRow({ application, onChanged }: { application: MyApplication
           <span className="row-title">A job that's no longer listed</span>
         )}
         <p className="meta">Applied {formatDate(application.created_at)}</p>
-        {problem && <p className="problem">{problem}</p>}
+        {problem && <p className="problem" role="alert">{problem}</p>}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <StageTag stage={application.stage} forCandidate />

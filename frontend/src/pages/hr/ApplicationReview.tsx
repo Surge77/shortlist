@@ -51,6 +51,10 @@ export function ApplicationReview({ applicationId }: { applicationId: string }) 
           </label>
         </div>
       </header>
+      {/* Always mounted, so screen readers announce when its text changes. */}
+      <p role="status" className="sr-only">
+        {isProcessing(detail) ? "Scoring the resume." : detail.processing_status === "scored" ? "Score ready." : ""}
+      </p>
       <div className="desk p-0">
         <div className="manuscript-column">
           <ScoreArea detail={detail} onRescored={reload} />
@@ -97,7 +101,7 @@ function ScoreArea({ detail, onRescored }: { detail: ApplicationDetail; onRescor
     );
   }
   if (isProcessing(detail)) {
-    return <p className="notice" role="status">Reading and scoring the resume… this takes about 20 seconds.</p>;
+    return <p className="notice">Reading and scoring the resume… this takes about 20 seconds.</p>;
   }
   return (
     <div className="stack">

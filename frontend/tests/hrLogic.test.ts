@@ -13,7 +13,7 @@ import {
   STUCK_AFTER_MS,
 } from "../src/hr/applicants";
 import { formatScore } from "../src/labels";
-import { fromDraft, isEmpty, lines, toDraft, weightsProblem } from "../src/hr/requirementsForm";
+import { fromDraft, isEmpty, lines, scoredCategories, toDraft, weightsProblem } from "../src/hr/requirementsForm";
 import { DEFAULT_WEIGHTS, EMPTY_REQUIREMENTS } from "../src/data/types";
 import { makeResponse } from "./fixtures";
 import { makeApplicant, makeScore } from "./portalFixtures";
@@ -100,9 +100,10 @@ describe("requirement form", () => {
   });
 
   it("checks weights are whole numbers in range and not all zero", () => {
-    expect(weightsProblem(DEFAULT_WEIGHTS)).toBeNull();
-    expect(weightsProblem({ ...DEFAULT_WEIGHTS, education: 1.5 })).toMatch(/whole number/);
-    expect(weightsProblem({ must_have: 0, nice_to_have: 0, experience: 0, education: 0, certifications: 0 })).toMatch(/above zero/);
+    const sqlOnly = { ...EMPTY_REQUIREMENTS, must_have: ["SQL"] };
+    expect(weightsProblem(DEFAULT_WEIGHTS, sqlOnly)).toBeNull();
+    expect(weightsProblem({ ...DEFAULT_WEIGHTS, education: 1.5 }, sqlOnly)).toMatch(/whole number/);
+    expect(weightsProblem({ must_have: 0, nice_to_have: 0, experience: 0, education: 0, certifications: 0 }, sqlOnly)).toMatch(/above zero/);
   });
 });
 
@@ -126,5 +127,14 @@ describe("review fixes", () => {
       summary: "Riya is a data analyst. KULKARNI built dashboards." } };
 
     expect(blindRecord(named).candidate.summary).toBe("[candidate] is a data analyst. [candidate] built dashboards.");
+  });
+});
+
+describe("weights", () => {
+  it("refuses weights that zero every category the job asks about", () => {
+    const sqlOnly = { ...EMPTY_REQUIREMENTS, must_have: ["SQL"] };
+    expect(weightsProblem({ ...DEFAULT_WEIGHTS, must_have: 0 }, sqlOnly)).toMatch(/weight above zero/);
+    expect(weightsProblem({ ...DEFAULT_WEIGHTS, experience: 0 }, sqlOnly)).toBeNull();
+    expect(scoredCategories({ ...sqlOnly, min_years: 2, education_fields: ["Maths"] })).toEqual(["must_have", "experience", "education"]);
   });
 });

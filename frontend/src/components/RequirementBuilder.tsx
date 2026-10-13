@@ -50,7 +50,7 @@ export function RequirementBuilder({ job, onSaved }: RequirementBuilderProps) {
       ? parsed.message
       : isEmpty(parsed.requirements)
         ? "Add at least one requirement."
-        : weightsProblem(weights);
+        : weightsProblem(weights, parsed.requirements);
     if (problem || !parsed.ok) return setPhase({ kind: "idle", message: null, problem });
     setPhase({ kind: "busy", action: "save" });
     const result = await saveRequirements(job.id, parsed.requirements, weights);

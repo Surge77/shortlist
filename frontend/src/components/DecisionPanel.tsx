@@ -58,6 +58,7 @@ export function DecisionPanel({ applicationId, stage, onStageChanged }: Decision
 
       <div>
         <h3 className="field-label mb-1">Notes (HR only)</h3>
+        {notes.state.status === "error" && <p className="problem">{notes.state.message}</p>}
         {notes.state.status === "ready" && notes.state.data.length === 0 && <p className="meta">No notes yet.</p>}
         {notes.state.status === "ready" && (
           <ul className="timeline">
@@ -85,6 +86,7 @@ export function DecisionPanel({ applicationId, stage, onStageChanged }: Decision
 
       <div>
         <h3 className="field-label mb-1">History</h3>
+        {events.state.status === "error" && <p className="problem">{events.state.message}</p>}
         {events.state.status === "ready" && events.state.data.length === 0 && <p className="meta">No stage changes yet.</p>}
         {events.state.status === "ready" && (
           <ol className="timeline">

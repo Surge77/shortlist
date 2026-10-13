@@ -49,7 +49,7 @@ def test_invalid_requirements_are_refused(client, fake_repo):
 
 
 def test_saving_requirements_for_an_unknown_job_is_404(client):
-    response = client.put(f"/api/jobs/{OPEN_JOB_ID}/requirements", json={"requirements": {}})
+    response = client.put(f"/api/jobs/{OPEN_JOB_ID}/requirements", json={"requirements": {"must_have": ["SQL"]}})
 
     assert response.status_code == 404
 
@@ -58,7 +58,7 @@ def test_candidates_cannot_draft_or_save_requirements(client, fake_repo):
     fake_repo.add_job(OPEN_JOB_ID)
     assert client.post("/api/requirements/draft", json={"description": DESCRIPTION},
                        headers=auth(ALICE_TOKEN)).status_code == 403
-    assert client.put(f"/api/jobs/{OPEN_JOB_ID}/requirements", json={"requirements": {}},
+    assert client.put(f"/api/jobs/{OPEN_JOB_ID}/requirements", json={"requirements": {"must_have": ["SQL"]}},
                       headers=auth(ALICE_TOKEN)).status_code == 403
 
 

@@ -84,9 +84,32 @@ class DraftRequest(BaseModel):
     description: str = Field(min_length=MIN_DESCRIPTION_CHARS, max_length=MAX_DESCRIPTION_CHARS)
 
 
+def scored_categories(requirements: JobRequirements) -> set[str]:
+    """The categories this job asks about; the scorer drops the rest."""
+    asked = {
+        "must_have": bool(requirements.must_have),
+        "nice_to_have": bool(requirements.nice_to_have),
+        "experience": bool(requirements.min_years),
+        "education": bool(requirements.education_level or requirements.education_fields),
+        "certifications": bool(requirements.certifications),
+    }
+    return {category for category, is_asked in asked.items() if is_asked}
+
+
 class RequirementsUpdate(BaseModel):
     requirements: JobRequirements
     weights: Weights = Field(default_factory=Weights)
+
+    @model_validator(mode="after")
+    def _something_to_score(self) -> "RequirementsUpdate":
+        categories = scored_categories(self.requirements)
+        if not categories:
+            raise ValueError("Add at least one requirement")
+        weights = self.weights.model_dump()
+        # Otherwise every application would silently end up with no score.
+        if all(weights[category] == 0 for category in categories):
+            raise ValueError("Give at least one of the job's requirement categories a weight above zero")
+        return self
 
 
 class RequirementsSaved(BaseModel):
