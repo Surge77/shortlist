@@ -2,7 +2,10 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.responses import Response
+from starlette.types import Scope
 
 from app.config import ALLOWED_HOSTS, CORS_ORIGINS, FRONTEND_DIST
 from app.documents import MAX_UPLOAD_BYTES, FileTooLarge
@@ -13,6 +16,20 @@ from app.routes import applications, extract, jobs
 # Multipart framing (boundaries, headers, text fields) on top of the largest file.
 MULTIPART_OVERHEAD_BYTES = 64 * 1024
 MAX_REQUEST_BYTES = MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD_BYTES
+HTTP_NOT_FOUND = 404
+
+
+class SinglePageApp(StaticFiles):
+    """Serves the built frontend, answering unknown paths with index.html so the
+    browser-side router can handle deep links such as /hr/jobs/<id>."""
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as exc:
+            if exc.status_code != HTTP_NOT_FOUND or path.startswith("api/"):
+                raise
+            return await super().get_response("index.html", scope)
 
 
 async def handle_known_error(_: Request, exc: Exception) -> JSONResponse:
@@ -46,7 +63,7 @@ def create_app() -> FastAPI:
     # Demo mode: serve the built React app from the same origin as the API. Mounted last
     # so the /api routes above take precedence.
     if FRONTEND_DIST.is_dir():
-        app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
+        app.mount("/", SinglePageApp(directory=FRONTEND_DIST, html=True), name="frontend")
 
     return app
 
