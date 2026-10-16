@@ -23,6 +23,14 @@ services:
         sync: false
       - key: VITE_SUPABASE_ANON_KEY
         sync: false
+      # Email-only sign-in for the class demo (fictional data only). Remove DEMO_LOGIN to
+      # go back to passwords; the allowlist alone decides who signs in as HR.
+      - key: DEMO_LOGIN
+        value: "true"
+      - key: DEMO_HR_EMAILS
+        value: hr.demo@example.com
+      - key: DEMO_CANDIDATE_EMAIL
+        value: riya.demo@example.com
       # The host check guards a server on localhost against DNS rebinding; behind Render's
       # proxy, with health checks arriving on internal hostnames, it only gets in the way.
       - key: EXTRA_ALLOWED_HOSTS

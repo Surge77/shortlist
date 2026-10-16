@@ -21,11 +21,15 @@ requirements, older scores are marked stale and can be rescored in one click.
 
 ## What each side can do
 
-**Candidates:** browse and search open jobs, sign up, apply once per job with a resume and an
-optional cover note, follow each application's status, withdraw while it's undecided.
+**Candidates:** browse open jobs and filter them by text, team, location and type; sign up;
+keep a saved resume on their profile and apply in one click, or upload a file per job; add an
+optional cover note; follow each application's status and withdraw while it's undecided.
 Candidates never see scores. This is enforced by the database, not just hidden in the UI.
 
-**HR:** create, publish and close jobs; draft and approve requirements; see applicants ranked
+**HR:** an overview of every job (headline counts, a stage funnel, newest applications, each
+job's average score and strong fits); create, publish and close jobs; draft and approve
+requirements; compare up to three applicants side by side, requirement by requirement with the
+evidence quotes; see applicants ranked
 by score with filters (fit, stage, missing must-haves), blind review, and CSV export. On the
 review page: the score's working beside the extracted record and the original file, stage
 changes (audited), private notes, history, and rescoring. HR also has a quick-extract tool
@@ -73,6 +77,37 @@ React (Vite) ──supabase-js──► Supabase: Auth · Postgres with row-leve
    in `supabase/seed.sql`, then run it in the SQL editor. It promotes that account to HR and
    adds three fictional open jobs.
 
+## Demo mode
+
+For a public class demo, `DEMO_LOGIN=true` replaces passwords with an email box and two
+one-click buttons. Every name, company and email in the demo data is fictional; don't let anyone
+upload a real resume while it is on.
+
+| Variable | Example | Meaning |
+|---|---|---|
+| `DEMO_LOGIN` | `true` | Turns email-only sign-in on. Off when unset. |
+| `DEMO_HR_EMAILS` | `hr.demo@example.com` | Comma-separated. These emails sign in as HR; every other email signs in as a candidate, and a new email gets an account. |
+| `DEMO_CANDIDATE_EMAIL` | `riya.demo@example.com` | The account behind "Sign in as candidate". |
+
+How it stays safe enough for a demo: the API creates the account if needed, sets its role from
+the allowlist, and returns a one-time token; the browser turns it into an ordinary Supabase
+session with `verifyOtp`. Row-level security still applies to every query. The trade-off is
+deliberate: anyone who knows an HR email can sign in as HR, so the mode is off by default.
+
+**Seed data.** `backend/app/demo/fixtures.json` holds 17 jobs across 11 departments (one a draft,
+for showing the requirement builder), 11 candidates and 23 applications with stage history and
+notes. The resumes are PDFs in `backend/app/demo/resumes/`, printed from
+`backend/scripts/demo_resumes/*.txt` by `python scripts/build_demo_resumes.py` (headless Edge).
+Load it, and score every application with the real pipeline, from your machine:
+
+```sh
+cd backend && .venv/Scripts/python -m app.demo.seed
+```
+
+It is safe to run again. **Reset:** on the HR overview, "Reset demo data" deletes everything the
+audience added (accounts, jobs, applications, files) and restores the seeded state in seconds,
+without calling Gemini.
+
 ## Run
 
 ```sh
@@ -96,6 +131,22 @@ example: a candidate can't read scores or another candidate's application, can't
 themselves to HR, and can't change a stage except by withdrawing.
 
 ## Deploy
+
+**Render (free), as configured in `render.yaml`:** one Docker web service that builds the
+frontend and serves it from FastAPI.
+
+1. Push the branch to GitHub (`render.yaml` deploys `feature/hiring-portal`).
+2. In Render: New → Blueprint → pick the repository. Render reads `render.yaml`.
+3. Enter the secret values when asked: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+   `GEMINI_API_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`. The demo settings are already
+   in the file.
+4. Run the seed once from your machine (above), then open the `onrender.com` URL.
+
+The free plan sleeps after 15 minutes without visitors and takes about a minute to wake, so open
+the site shortly before presenting. Supabase's free plan pauses a project after a week without
+activity; restore it from the Supabase dashboard if that happens.
+
+Other options:
 
 - **One service:** build the frontend, then run FastAPI (Railway, Render, a VM). Same origin,
   so no CORS. Set `EXTRA_ALLOWED_HOSTS` to the public hostname.
