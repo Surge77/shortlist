@@ -16,6 +16,7 @@ vi.mock("../src/lib/supabase", () => ({
 
 const { createJob, getJob, listHrJobs, listOpenJobs, saveError, updateJob } = await import("../src/data/jobs");
 const applications = await import("../src/data/applications");
+const profile = await import("../src/data/profile");
 
 let db: ReturnType<typeof fakeSupabase>;
 
@@ -139,5 +140,47 @@ describe("applications data", () => {
     expect((await applications.listStageEvents("a")).ok).toBe(true);
     expect(await applications.resumeUrl("c/a.pdf")).toEqual({ ok: true, data: "https://signed.example/a.pdf" });
     expect(db.calls[2].steps[0][1]).toEqual(["c/a.pdf", 300]);
+  });
+});
+
+describe("profile data", () => {
+  it("reads only the signed-in candidate's name and saved resume", async () => {
+    const row = { full_name: "Riya", resume_path: "c1/profile-demo.pdf", resume_filename: "cv.pdf", resume_updated_at: null };
+    db.reply("profiles", { data: row });
+
+    expect(await profile.getMyProfile("c1")).toEqual({ ok: true, data: row });
+    expect(db.calls[0].steps).toContainEqual(["eq", ["id", "c1"]]);
+  });
+
+  it("renames through the one column the browser may write", async () => {
+    db.reply("profiles", {});
+    db.reply("profiles", { error: { message: "permission denied" } });
+
+    expect(await profile.renameMe("c1", "Riya K.")).toEqual({ ok: true, data: null });
+    expect(db.calls[0].steps).toContainEqual(["update", [{ full_name: "Riya K." }]]);
+    expect(await profile.renameMe("c1", "x")).toEqual({ ok: false, message: "Couldn't save your name. Try again." });
+    db.reply("profiles", { error: { message: "boom" } });
+    expect(await profile.getMyProfile("c1")).toMatchObject({ ok: false });
+  });
+});
+
+describe("overview data", () => {
+  it("flattens each application's name and score headline, newest first and capped", async () => {
+    db.reply("applications", { data: [
+      { id: "a1", job_id: "j1", stage: "submitted", processing_status: "scored", created_at: "2026-10-10T00:00:00Z",
+        profiles: { full_name: "Asha" }, scores: [{ total: 80, band: "strong" }] },
+      { id: "a2", job_id: "j1", stage: "reviewing", processing_status: "failed", created_at: "2026-10-09T00:00:00Z",
+        profiles: null, scores: null },
+    ] });
+
+    const result = await applications.listAllApplications();
+
+    expect(result).toEqual({ ok: true, data: [
+      { id: "a1", job_id: "j1", stage: "submitted", processing_status: "scored", created_at: "2026-10-10T00:00:00Z",
+        full_name: "Asha", score: { total: 80, band: "strong" } },
+      { id: "a2", job_id: "j1", stage: "reviewing", processing_status: "failed", created_at: "2026-10-09T00:00:00Z",
+        full_name: null, score: null },
+    ] });
+    expect(db.calls[0].steps).toContainEqual(["limit", [applications.OVERVIEW_LIMIT]]);
   });
 });
