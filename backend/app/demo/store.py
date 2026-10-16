@@ -5,6 +5,7 @@ hundreds; the restore logic in reset.py depends only on the protocol, and tests 
 """
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 from app.repository import SavedResume
@@ -105,6 +106,7 @@ class SupabaseDemoStore:
             "resume_path": resume.path if resume else None,
             "resume_source_type": resume.source_type if resume else None,
             "resume_filename": resume.filename if resume else None,
+            "resume_updated_at": datetime.now(UTC).isoformat() if resume else None,
         })
 
     async def upload_pdf(self, path: str, data: bytes) -> None:
