@@ -19,7 +19,7 @@ export function safeNext(next: string | null): string | null {
 
 export function AuthPage({ mode, next }: { mode: Mode; next: string | null }) {
   const { state } = useLoad(getAuthOptions, "auth-options");
-  if (state.status === "loading") return <div className="page meta">Loading…</div>;
+  if (state.status === "loading") return <div className="page meta">Loadingâ€¦</div>;
   // Demo mode replaces both sign-in and sign-up; if the server can't say, offer passwords.
   if (state.status === "ready" && state.data.demo) return <DemoSignIn options={state.data} next={safeNext(next)} />;
   return <PasswordAuth mode={mode} next={next} />;
