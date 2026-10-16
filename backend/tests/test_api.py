@@ -14,6 +14,12 @@ def test_health_reports_ok(client):
     assert client.get("/api/health").json() == {"ok": True}
 
 
+def test_health_answers_head_requests_as_uptime_monitors_send(client):
+    response = client.head("/api/health")
+
+    assert response.status_code == 200
+
+
 def test_pasted_text_is_sent_inside_resume_tags(client, fake_generator):
     fake_generator.replies.append(a_candidate())
 

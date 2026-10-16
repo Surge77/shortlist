@@ -52,7 +52,9 @@ def create_app() -> FastAPI:
         app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["GET", "POST", "PUT", "DELETE"],
                            allow_headers=["Authorization", "Content-Type"])
 
-    @app.get("/api/health")
+    # HEAD too: uptime monitors (UptimeRobot) send HEAD, and implicit HEAD-for-GET has
+    # varied between Starlette releases.
+    @app.api_route("/api/health", methods=["GET", "HEAD"])
     async def health() -> dict[str, bool]:
         return {"ok": True}
 
