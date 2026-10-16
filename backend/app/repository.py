@@ -5,6 +5,7 @@ fake, and `SupabaseRepository` is the real thing.
 """
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from functools import lru_cache
 from typing import Any, Literal, Protocol
 
@@ -48,6 +49,15 @@ class NewApplication:
 
 
 @dataclass(frozen=True)
+class SavedResume:
+    """A candidate's resume kept on their profile for one-click applications."""
+
+    path: str
+    source_type: SourceType
+    filename: str
+
+
+@dataclass(frozen=True)
 class StoredExtraction:
     candidate: Candidate
     experience_months: int | None
@@ -66,6 +76,8 @@ class Repository(Protocol):
     async def store_resume(self, path: str, data: bytes, content_type: str) -> None: ...
     async def load_resume(self, path: str) -> bytes: ...
     async def delete_resume(self, path: str) -> None: ...
+    async def get_saved_resume(self, user_id: str) -> SavedResume | None: ...
+    async def set_saved_resume(self, user_id: str, resume: SavedResume | None) -> None: ...
     async def create_application(self, application: NewApplication) -> None: ...
     async def get_application(self, application_id: str) -> Application | None: ...
     async def list_application_ids(self, job_id: str) -> list[str]: ...
@@ -135,6 +147,22 @@ class SupabaseRepository:
 
     async def delete_resume(self, path: str) -> None:
         await self._db().remove(path)
+
+    async def get_saved_resume(self, user_id: str) -> SavedResume | None:
+        row = await self._one("profiles", {"select": "resume_path,resume_source_type,resume_filename",
+                                           "id": _eq(user_id)})
+        if row is None or not row.get("resume_path"):
+            return None
+        return SavedResume(path=row["resume_path"], source_type=row["resume_source_type"],
+                           filename=row.get("resume_filename") or "resume")
+
+    async def set_saved_resume(self, user_id: str, resume: SavedResume | None) -> None:
+        await self._db().update("profiles", {"id": _eq(user_id)}, {
+            "resume_path": resume.path if resume else None,
+            "resume_source_type": resume.source_type if resume else None,
+            "resume_filename": resume.filename if resume else None,
+            "resume_updated_at": datetime.now(UTC).isoformat() if resume else None,
+        })
 
     async def create_application(self, application: NewApplication) -> None:
         await self._db().insert("applications", {

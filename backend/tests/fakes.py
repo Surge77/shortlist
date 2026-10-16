@@ -2,7 +2,8 @@
 
 from dataclasses import dataclass, field, replace
 
-from app.repository import Application, Job, NewApplication, ProcessingStatus, Role, StoredExtraction
+from app.repository import (Application, Job, NewApplication, ProcessingStatus, Role, SavedResume,
+                            StoredExtraction)
 from app.requirements import JobRequirements, Weights
 from app.scoring import ScoreResult
 from app.supabase_rest import DuplicateRow
@@ -39,6 +40,7 @@ class FakeRepository:
     processing: dict[str, tuple[ProcessingStatus, str | None]] = field(default_factory=dict)
     extractions: dict[str, StoredExtraction] = field(default_factory=dict)
     scores: dict[str, SavedScore] = field(default_factory=dict)
+    saved_resumes: dict[str, SavedResume] = field(default_factory=dict)
     fail_inserts_as_duplicate: bool = False
 
     def add_job(self, job_id: str, *, status: str = "open", requirements: JobRequirements | None = None,
@@ -73,6 +75,15 @@ class FakeRepository:
 
     async def delete_resume(self, path: str) -> None:
         self.files.pop(path, None)
+
+    async def get_saved_resume(self, user_id: str) -> SavedResume | None:
+        return self.saved_resumes.get(user_id)
+
+    async def set_saved_resume(self, user_id: str, resume: SavedResume | None) -> None:
+        if resume is None:
+            self.saved_resumes.pop(user_id, None)
+        else:
+            self.saved_resumes[user_id] = resume
 
     async def create_application(self, application: NewApplication) -> None:
         if self.fail_inserts_as_duplicate:

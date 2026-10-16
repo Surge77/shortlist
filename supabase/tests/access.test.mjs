@@ -245,3 +245,21 @@ test("signed-out visitors cannot call is_hr", async () => {
   await assert.rejects(as(db, null, "select public.is_hr()"), /permission denied/);
   assert.deepEqual(await as(db, HR, "select public.is_hr() as hr"), [{ hr: true }]);
 });
+
+test("a candidate cannot point their profile at a resume file; only the api sets it", async () => {
+  const db = await freshDb();
+  const update = `update public.profiles set resume_path = '${BOB}/${BOB_APP}.pdf', resume_source_type = 'pdf' where id = '${ALICE}'`;
+  await assert.rejects(as(db, ALICE, update), /permission denied/);
+});
+
+test("a saved resume always has both its file and its type", async () => {
+  const db = await freshDb();
+  await assert.rejects(
+    db.query(`update public.profiles set resume_path = '${ALICE}/profile-1.pdf' where id = $1`, [ALICE]),
+    /saved_resume_complete/,
+  );
+  await db.query(
+    `update public.profiles set resume_path = '${ALICE}/profile-1.pdf', resume_source_type = 'pdf' where id = $1`, [ALICE]);
+  const rows = await as(db, ALICE, "select resume_path from public.profiles where id = $1", [ALICE]);
+  assert.deepEqual(rows, [{ resume_path: `${ALICE}/profile-1.pdf` }]);
+});

@@ -14,7 +14,7 @@ from app.documents import MAX_UPLOAD_BYTES, InputProblem, ResumeSource, from_upl
 from app.errors import UserFacingError
 from app.gemini import JsonGenerator, get_generator
 from app.rate_limit import APPLY_LIMIT, GEMINI_HR_LIMIT
-from app.repository import NewApplication
+from app.repository import NewApplication, Repository
 from app.supabase_rest import DuplicateRow
 
 Generator = Annotated[JsonGenerator, Depends(get_generator)]
@@ -42,6 +42,19 @@ class ApplicationNotFound(UserFacingError):
     user_message = "That application doesn't exist."
 
 
+class NoSavedResume(UserFacingError):
+    status_code = 404
+    user_message = "You have no saved resume. Add one on your profile, or choose a file."
+
+
+class ChooseOneResume(InputProblem):
+    user_message = "Choose a resume file or your saved resume, not both."
+
+
+class NoResumeGiven(InputProblem):
+    user_message = "Choose your resume file."
+
+
 class CoverNoteTooLong(InputProblem):
     status_code = 413
     user_message = f"The cover note is limited to {MAX_COVER_NOTE_CHARS:,} characters."
@@ -66,6 +79,21 @@ def clean_cover_note(note: str | None) -> str | None:
     return text or None
 
 
+async def resume_bytes(user_id: str, file: UploadFile | None, use_saved: bool, repo: Repository) -> bytes:
+    """The resume to apply with. A saved resume is copied into the application, so
+    replacing it later never changes what HR reviewed."""
+    if file is not None and use_saved:
+        raise ChooseOneResume()
+    if file is not None:
+        return await file.read(MAX_UPLOAD_BYTES + 1)
+    if not use_saved:
+        raise NoResumeGiven()
+    saved = await repo.get_saved_resume(user_id)
+    if saved is None:
+        raise NoSavedResume()
+    return await repo.load_resume(saved.path)
+
+
 @router.post("/jobs/{job_id}/applications", response_model=Applied, status_code=201)
 async def apply(
     job_id: UUID,
@@ -73,8 +101,9 @@ async def apply(
     repo: Repo,
     generator: Generator,
     background: BackgroundTasks,
-    file: Annotated[UploadFile, File()],
+    file: Annotated[UploadFile | None, File()] = None,
     cover_note: Annotated[str | None, Form()] = None,
+    use_saved_resume: Annotated[bool, Form()] = False,
 ) -> Applied:
     APPLY_LIMIT.check(user.id)
     job = await repo.get_job(str(job_id))
@@ -84,7 +113,7 @@ async def apply(
         raise AlreadyApplied()
     note = clean_cover_note(cover_note)
 
-    data = await file.read(MAX_UPLOAD_BYTES + 1)
+    data = await resume_bytes(user.id, file, use_saved_resume, repo)
     # Type and size are checked from the bytes before anything is stored.
     source = await run_in_threadpool(from_upload, data)
     mime = resume_mime(source)

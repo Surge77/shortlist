@@ -11,7 +11,7 @@ from app.config import ALLOWED_HOSTS, CORS_ORIGINS, FRONTEND_DIST
 from app.documents import MAX_UPLOAD_BYTES, FileTooLarge
 from app.errors import UserFacingError
 from app.limits import BodySizeLimit
-from app.routes import applications, demo, extract, jobs
+from app.routes import applications, demo, extract, jobs, profile
 
 # Multipart framing (boundaries, headers, text fields) on top of the largest file.
 MULTIPART_OVERHEAD_BYTES = 64 * 1024
@@ -49,7 +49,7 @@ def create_app() -> FastAPI:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
     if CORS_ORIGINS:
         # Bearer tokens, not cookies, so credentials stay off; origins are listed exactly.
-        app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["GET", "POST", "PUT"],
+        app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["GET", "POST", "PUT", "DELETE"],
                            allow_headers=["Authorization", "Content-Type"])
 
     @app.get("/api/health")
@@ -60,6 +60,7 @@ def create_app() -> FastAPI:
     app.include_router(jobs.router)
     app.include_router(applications.router)
     app.include_router(demo.router)
+    app.include_router(profile.router)
 
     # Demo mode: serve the built React app from the same origin as the API. Mounted last
     # so the /api routes above take precedence.
