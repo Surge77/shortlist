@@ -26,6 +26,7 @@ function signedInAs(auth: authModule.AuthState) {
   vi.mocked(authModule.useAuth).mockReturnValue({
     auth,
     signIn: vi.fn(),
+    signInWithEmail: vi.fn(),
     signUp: vi.fn(),
     signOut: vi.fn(),
   });

@@ -14,8 +14,12 @@ const state = vi.hoisted(() => ({
     signUp: vi.fn(),
     signOut: vi.fn(),
     getSession: vi.fn(),
+    verifyOtp: vi.fn(),
   },
+  demoSignIn: vi.fn(),
 }));
+
+vi.mock("../src/api", () => ({ demoSignIn: state.demoSignIn }));
 
 vi.mock("../src/lib/supabase", () => ({
   get supabase() {
@@ -47,6 +51,37 @@ afterEach(() => {
 });
 
 describe("AuthProvider", () => {
+  it("signs in by email by exchanging the server's one-time token for a session", async () => {
+    state.demoSignIn.mockResolvedValue({ ok: true, data: { token_hash: "hash-1" } });
+    state.auth.verifyOtp.mockResolvedValue({ data: { user: { id: "u9", email: "hr.demo@example.com" } }, error: null });
+    state.db?.reply("profiles", { data: { role: "hr", full_name: "Priya Sharma" } });
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await act(async () => expect(await result.current.signInWithEmail("hr.demo@example.com")).toEqual({ ok: true }));
+
+    expect(state.demoSignIn).toHaveBeenCalledWith("hr.demo@example.com");
+    expect(state.auth.verifyOtp).toHaveBeenCalledWith({ token_hash: "hash-1", type: "magiclink" });
+    expect(result.current.auth).toMatchObject({ status: "signedIn", role: "hr", fullName: "Priya Sharma" });
+  });
+
+  it("passes on the server's reason when email sign-in is refused, and never verifies", async () => {
+    state.demoSignIn.mockResolvedValue({ ok: false, message: "Enter a valid email address." });
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await act(async () => expect(await result.current.signInWithEmail("bad")).toEqual(
+      { ok: false, message: "Enter a valid email address." }));
+    expect(state.auth.verifyOtp).not.toHaveBeenCalled();
+  });
+
+  it("reports a token the auth server rejects", async () => {
+    state.demoSignIn.mockResolvedValue({ ok: true, data: { token_hash: "stale" } });
+    state.auth.verifyOtp.mockResolvedValue({ data: { user: null }, error: { message: "expired" } });
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await act(async () => expect((await result.current.signInWithEmail("a@example.com")).ok).toBe(false));
+    expect(result.current.auth.status).not.toBe("signedIn");
+  });
+
   it("loads the stored session's profile and role", async () => {
     state.db?.reply("profiles", { data: { role: "hr", full_name: "Hana" } });
     render(<AuthProvider><Probe /></AuthProvider>);

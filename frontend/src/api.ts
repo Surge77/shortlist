@@ -96,3 +96,52 @@ export async function rescoreJob(jobId: string): Promise<ApiResult<{ queued: num
   return request(`/api/jobs/${encodeURIComponent(jobId)}/rescore`, { method: "POST" },
     (p) => isRecord(p) && typeof p.queued === "number");
 }
+
+export interface AuthOptions {
+  demo: boolean;
+  hr_email: string | null;
+  candidate_email: string | null;
+}
+
+export async function getAuthOptions(): Promise<ApiResult<AuthOptions>> {
+  return request("/api/auth/options", { method: "GET" }, (p) => isRecord(p) && typeof p.demo === "boolean");
+}
+
+export async function demoSignIn(email: string): Promise<ApiResult<{ token_hash: string }>> {
+  return request("/api/auth/demo-login", { method: "POST", json: { email } },
+    (p) => isRecord(p) && typeof p.token_hash === "string");
+}
+
+export interface ResetResult {
+  deleted_applications: number;
+  deleted_jobs: number;
+  deleted_accounts: number;
+  rescoring: number;
+}
+
+export async function resetDemo(): Promise<ApiResult<ResetResult>> {
+  return request("/api/demo/reset", { method: "POST" }, (p) => isRecord(p) && typeof p.deleted_jobs === "number");
+}
+
+export interface SavedResumeInfo {
+  filename: string;
+  source_type: string;
+}
+
+export async function saveResume(file: File): Promise<ApiResult<SavedResumeInfo>> {
+  const form = new FormData();
+  form.append("file", file);
+  return request("/api/me/resume", { method: "PUT", body: form }, (p) => isRecord(p) && typeof p.filename === "string");
+}
+
+export async function removeSavedResume(): Promise<ApiResult<null>> {
+  return request("/api/me/resume", { method: "DELETE" }, () => true);
+}
+
+export async function quickApply(jobId: string, coverNote: string): Promise<ApiResult<{ id: string }>> {
+  const form = new FormData();
+  form.append("use_saved_resume", "true");
+  if (coverNote.trim()) form.append("cover_note", coverNote.trim());
+  return request(`/api/jobs/${encodeURIComponent(jobId)}/applications`, { method: "POST", body: form },
+    (p) => isRecord(p) && typeof p.id === "string");
+}

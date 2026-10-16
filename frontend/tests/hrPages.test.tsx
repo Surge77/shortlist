@@ -29,7 +29,7 @@ function visit(path: string) {
 beforeEach(() => {
   vi.mocked(authModule.useAuth).mockReturnValue({
     auth: { status: "signedIn", userId: "h", email: "hr@example.com", role: "hr", fullName: "Hana" },
-    signIn: vi.fn(), signUp: vi.fn(), signOut: vi.fn(),
+    signIn: vi.fn(), signInWithEmail: vi.fn(), signUp: vi.fn(), signOut: vi.fn(),
   });
   localStorage.clear();
 });

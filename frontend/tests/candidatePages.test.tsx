@@ -1,7 +1,8 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import * as api from "../src/api";
 import { App } from "../src/App";
 import * as authModule from "../src/auth/AuthProvider";
 import * as applications from "../src/data/applications";
@@ -26,8 +27,20 @@ const signUp = vi.fn();
 const signOut = vi.fn();
 
 function as(auth: authModule.AuthState) {
-  vi.mocked(authModule.useAuth).mockReturnValue({ auth, signIn, signUp, signOut });
+  vi.mocked(authModule.useAuth).mockReturnValue({ auth, signIn, signInWithEmail, signUp, signOut });
 }
+
+const signInWithEmail = vi.fn();
+
+function authMode(demo: boolean) {
+  vi.mocked(api.getAuthOptions).mockResolvedValue({
+    ok: true,
+    data: { demo, hr_email: demo ? "hr.demo@example.com" : null, candidate_email: demo ? "riya.demo@example.com" : null },
+  });
+}
+
+// Password mode unless a test says otherwise; RequireRole redirects also land on /login.
+beforeEach(() => authMode(false));
 
 function visit(path: string) {
   window.history.replaceState(null, "", path);
@@ -128,14 +141,68 @@ describe("my applications", () => {
 });
 
 describe("sign in and sign up", () => {
+  it("in demo mode signs in by email alone, with no password field", async () => {
+    as({ status: "signedOut" });
+    authMode(true);
+    signInWithEmail.mockResolvedValue({ ok: true });
+    vi.mocked(jobs.listOpenJobs).mockResolvedValue({ ok: true, data: [] });
+    const user = userEvent.setup();
+
+    visit("/login?next=%2Fjobs");
+    await user.type(await screen.findByLabelText("Email"), " asha@example.com ");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
+    expect(signInWithEmail).toHaveBeenCalledWith("asha@example.com");
+    expect(window.location.pathname).toBe("/jobs");
+  });
+
+  it("in demo mode offers one-click HR and candidate sign-in", async () => {
+    as({ status: "signedOut" });
+    authMode(true);
+    signInWithEmail.mockResolvedValue({ ok: true });
+    const user = userEvent.setup();
+
+    visit("/signup");
+    await user.click(await screen.findByRole("button", { name: "Sign in as HR" }));
+
+    expect(signInWithEmail).toHaveBeenCalledWith("hr.demo@example.com");
+    expect(window.location.pathname).toBe("/hr");
+  });
+
+  it("in demo mode explains a failed sign-in and asks for an email first", async () => {
+    as({ status: "signedOut" });
+    authMode(true);
+    signInWithEmail.mockResolvedValue({ ok: false, message: "Enter a valid email address." });
+    const user = userEvent.setup();
+
+    visit("/login");
+    await user.click(await screen.findByRole("button", { name: "Continue" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Enter your email.");
+
+    await user.type(screen.getByLabelText("Email"), "nope");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("valid email");
+  });
+
+  it("falls back to password sign-in when the server can't say which mode it is in", async () => {
+    as({ status: "signedOut" });
+    vi.mocked(api.getAuthOptions).mockResolvedValue({ ok: false, message: "offline" });
+
+    visit("/login");
+
+    expect(await screen.findByLabelText("Password")).toBeInTheDocument();
+  });
+
   it("signs in and returns to the page that asked", async () => {
     as({ status: "signedOut" });
     signIn.mockResolvedValue({ ok: true });
     vi.mocked(jobs.listOpenJobs).mockResolvedValue({ ok: true, data: [] });
     const user = userEvent.setup();
 
+    authMode(false);
     visit("/login?next=%2Fjobs");
-    await user.type(screen.getByLabelText("Email"), "riya@example.com");
+    await user.type(await screen.findByLabelText("Email"), "riya@example.com");
     await user.type(screen.getByLabelText("Password"), "correct horse");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
@@ -148,8 +215,9 @@ describe("sign in and sign up", () => {
     signIn.mockResolvedValue({ ok: false, message: "That email and password don't match an account." });
     const user = userEvent.setup();
 
+    authMode(false);
     visit("/login");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(await screen.findByRole("button", { name: "Sign in" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Enter your email and password.");
 
     await user.type(screen.getByLabelText("Email"), "x@example.com");
@@ -163,8 +231,9 @@ describe("sign in and sign up", () => {
     signUp.mockResolvedValue({ ok: true });
     const user = userEvent.setup();
 
+    authMode(false);
     visit("/signup");
-    await user.type(screen.getByLabelText("Email"), "new@example.com");
+    await user.type(await screen.findByLabelText("Email"), "new@example.com");
     await user.type(screen.getByLabelText("Password"), "short");
     await user.click(screen.getByRole("button", { name: "Create account" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Enter your name.");

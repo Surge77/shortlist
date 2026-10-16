@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { demoSignIn } from "../api";
 import type { Role } from "../data/types";
 import { NOT_CONFIGURED, supabase } from "../lib/supabase";
 
@@ -14,6 +15,7 @@ export type AuthResult = { ok: true } | { ok: false; message: string };
 interface AuthContextValue {
   auth: AuthState;
   signIn: (email: string, password: string) => Promise<AuthResult>;
+  signInWithEmail: (email: string) => Promise<AuthResult>;
   signUp: (email: string, password: string, fullName: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
@@ -22,6 +24,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const SIGN_IN_FAILED = "That email and password don't match an account.";
 const NO_PROFILE = "Your account has no profile yet. Try again in a moment.";
+const LINK_FAILED = "Couldn't sign you in. Try again.";
 
 async function loadProfile(userId: string, email: string): Promise<AuthState> {
   if (!supabase) return { status: "unconfigured" };
@@ -65,6 +68,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true };
   }, []);
 
+  // Demo mode: the API vouches for the email and hands back a one-time token, which
+  // becomes an ordinary Supabase session here. No password and no inbox involved.
+  const signInWithEmail = useCallback(async (email: string): Promise<AuthResult> => {
+    if (!supabase) return { ok: false, message: NOT_CONFIGURED };
+    const link = await demoSignIn(email);
+    if (!link.ok) return link;
+    const { data, error } = await supabase.auth.verifyOtp({ token_hash: link.data.token_hash, type: "magiclink" });
+    if (error || !data.user) return { ok: false, message: LINK_FAILED };
+    const next = await loadProfile(data.user.id, data.user.email ?? email);
+    if (next.status !== "signedIn") return { ok: false, message: NO_PROFILE };
+    setAuth(next);
+    return { ok: true };
+  }, []);
+
   const signUp = useCallback(async (email: string, password: string, fullName: string): Promise<AuthResult> => {
     if (!supabase) return { ok: false, message: NOT_CONFIGURED };
     // The name travels as user metadata; a database trigger copies it into the profile.
@@ -79,7 +96,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuth({ status: "signedOut" });
   }, []);
 
-  const value = useMemo(() => ({ auth, signIn, signUp, signOut }), [auth, signIn, signUp, signOut]);
+  const value = useMemo(
+    () => ({ auth, signIn, signInWithEmail, signUp, signOut }),
+    [auth, signIn, signInWithEmail, signUp, signOut],
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
