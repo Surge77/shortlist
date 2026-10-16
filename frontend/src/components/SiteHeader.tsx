@@ -10,15 +10,21 @@ interface NavItem {
 }
 
 const PUBLIC_NAV: NavItem[] = [{ to: "/jobs", label: "Jobs" }];
-const CANDIDATE_NAV: NavItem[] = [...PUBLIC_NAV, { to: "/me/applications", label: "My applications" }];
+const CANDIDATE_NAV: NavItem[] = [
+  ...PUBLIC_NAV,
+  { to: "/me/applications", label: "My applications" },
+  { to: "/me/profile", label: "Profile" },
+];
 const HR_NAV: NavItem[] = [
-  { to: "/hr", label: "Jobs & applicants" },
+  { to: "/hr", label: "Overview" },
+  { to: "/hr/jobs", label: "Jobs & applicants" },
   { to: "/hr/extract", label: "Quick extract" },
   { to: "/jobs", label: "Public board" },
 ];
 
 function isCurrent(item: NavItem, path: string): boolean {
-  if (item.to === "/hr") return path === "/hr" || (path.startsWith("/hr/") && !path.startsWith("/hr/extract"));
+  if (item.to === "/hr") return path === "/hr";
+  if (item.to === "/hr/jobs") return path.startsWith("/hr/jobs") || path.startsWith("/hr/applications");
   if (item.to === "/jobs") return path === "/" || path.startsWith("/jobs");
   return path.startsWith(item.to);
 }

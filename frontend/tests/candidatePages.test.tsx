@@ -7,11 +7,13 @@ import { App } from "../src/App";
 import * as authModule from "../src/auth/AuthProvider";
 import * as applications from "../src/data/applications";
 import * as jobs from "../src/data/jobs";
+import * as profile from "../src/data/profile";
 import { navigate } from "../src/router";
 import { makeJobRow } from "./portalFixtures";
 
 vi.mock("../src/api");
 vi.mock("../src/data/jobs");
+vi.mock("../src/data/profile");
 vi.mock("../src/data/applications");
 vi.mock("../src/auth/AuthProvider", async (original) => ({
   ...(await original<typeof authModule>()),
@@ -40,7 +42,10 @@ function authMode(demo: boolean) {
 }
 
 // Password mode unless a test says otherwise; RequireRole redirects also land on /login.
-beforeEach(() => authMode(false));
+beforeEach(() => {
+  authMode(false);
+  vi.mocked(profile.getMyProfile).mockResolvedValue({ ok: true, data: null });
+});
 
 function visit(path: string) {
   window.history.replaceState(null, "", path);
@@ -293,5 +298,59 @@ describe("data that depends on who is signed in", () => {
 
     expect(screen.queryByRole("button", { name: "Send application" })).not.toBeInTheDocument();
     expect(await screen.findByText(/You applied on/)).toBeInTheDocument();
+  });
+});
+
+describe("profile", () => {
+  const saved = { full_name: "Riya Kulkarni", resume_path: "c1/profile-demo.pdf", resume_filename: "Riya resume.pdf",
+    resume_updated_at: "2026-10-12T00:00:00Z" };
+
+  it("shows the saved resume, replaces it, and refuses a wrong file type first", async () => {
+    as(CANDIDATE);
+    vi.mocked(profile.getMyProfile).mockResolvedValue({ ok: true, data: saved });
+    vi.mocked(api.saveResume).mockResolvedValue({ ok: true, data: { filename: "new.pdf", source_type: "pdf" } });
+    const user = userEvent.setup({ applyAccept: false });
+
+    visit("/me/profile");
+    expect(await screen.findByText("Riya resume.pdf")).toBeInTheDocument();
+    const input = screen.getByLabelText("Replace with a new file");
+    await user.upload(input, new File(["x"], "tool.exe"));
+    expect(screen.getByRole("alert")).toHaveTextContent(/Upload a PDF/);
+    expect(api.saveResume).not.toHaveBeenCalled();
+
+    const file = new File(["%PDF"], "new.pdf", { type: "application/pdf" });
+    await user.upload(input, file);
+    expect(api.saveResume).toHaveBeenCalledWith(file);
+    expect(await screen.findByRole("status")).toHaveTextContent("Saved new.pdf.");
+  });
+
+  it("removes the saved resume and renames the candidate", async () => {
+    as(CANDIDATE);
+    vi.mocked(profile.getMyProfile).mockResolvedValue({ ok: true, data: saved });
+    vi.mocked(api.removeSavedResume).mockResolvedValue({ ok: true, data: null });
+    vi.mocked(profile.renameMe).mockResolvedValue({ ok: true, data: null });
+    const user = userEvent.setup();
+
+    visit("/me/profile");
+    await user.click(await screen.findByRole("button", { name: "Remove" }));
+    expect(await screen.findByText("Saved resume removed.")).toBeInTheDocument();
+
+    const name = screen.getByLabelText("Full name");
+    await user.clear(name);
+    await user.click(screen.getByRole("button", { name: "Save name" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("Enter your name.");
+    await user.type(name, "Riya K.");
+    await user.click(screen.getByRole("button", { name: "Save name" }));
+    expect(profile.renameMe).toHaveBeenCalledWith("c1", "Riya K.");
+  });
+
+  it("invites a candidate without a saved resume to add one", async () => {
+    as(CANDIDATE);
+    vi.mocked(profile.getMyProfile).mockResolvedValue({ ok: true, data: { ...saved, resume_path: null, resume_filename: null } });
+
+    visit("/me/profile");
+
+    expect(await screen.findByText(/No saved resume yet/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Remove" })).not.toBeInTheDocument();
   });
 });

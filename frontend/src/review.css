@@ -112,3 +112,31 @@
   border-bottom: 1px solid var(--faint);
   font-size: 0.9rem;
 }
+
+/* Compare: requirement names run down the left as row headers, in body type rather than
+   the column headers' small capitals; a missing requirement wears the red query pencil. */
+.compare tbody th {
+  min-width: 14rem;
+  border-bottom: 1px solid var(--hair);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  vertical-align: top;
+}
+
+.compare td {
+  min-width: 12rem;
+}
+
+.compare-missing {
+  color: var(--red);
+}
+
+.compare-quote {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

@@ -1,3 +1,4 @@
+import type { OverviewRow } from "../hr/dashboard";
 import { NOT_CONFIGURED, supabase } from "../lib/supabase";
 import type { ApiResult } from "../types";
 import { LOAD_FAILED } from "./jobs";
@@ -142,4 +143,30 @@ export async function resumeUrl(path: string): Promise<ApiResult<string>> {
   if (!supabase) return { ok: false, message: NOT_CONFIGURED };
   const { data, error } = await supabase.storage.from("resumes").createSignedUrl(path, SIGNED_URL_SECONDS);
   return error || !data ? { ok: false, message: "Couldn't open the resume file." } : { ok: true, data: data.signedUrl };
+}
+
+// Enough for the overview of a small hiring team; the overview says so if it is cut off.
+export const OVERVIEW_LIMIT = 1000;
+
+interface RawOverviewRow extends Omit<OverviewRow, "full_name" | "score"> {
+  profiles: { full_name: string | null } | null;
+  scores: OverviewRow["score"] | NonNullable<OverviewRow["score"]>[] | null;
+}
+
+export async function listAllApplications(): Promise<ApiResult<OverviewRow[]>> {
+  if (!supabase) return { ok: false, message: NOT_CONFIGURED };
+  const { data, error } = await supabase
+    .from("applications")
+    .select("id,job_id,stage,processing_status,created_at,profiles(full_name),scores(total,band)")
+    .order("created_at", { ascending: false })
+    .limit(OVERVIEW_LIMIT);
+  if (error) return { ok: false, message: LOAD_FAILED };
+  return {
+    ok: true,
+    data: (data as unknown as RawOverviewRow[]).map(({ profiles, scores, ...row }) => ({
+      ...row,
+      full_name: profiles?.full_name ?? null,
+      score: one(scores),
+    })),
+  };
 }

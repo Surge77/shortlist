@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as api from "../src/api";
 import * as authModule from "../src/auth/AuthProvider";
@@ -8,15 +8,17 @@ import { ApplyForm } from "../src/components/ApplyForm";
 import { RequireRole } from "../src/components/RequireRole";
 import { ScorePanel } from "../src/components/ScorePanel";
 import * as jobs from "../src/data/jobs";
+import * as profile from "../src/data/profile";
 import { safeNext } from "../src/pages/AuthPage";
 import { fieldsProblem } from "../src/pages/hr/JobEditor";
 import { toExtractResponse } from "../src/pages/hr/ApplicationReview";
-import { filterJobs, JobBoard, jobMeta } from "../src/pages/JobBoard";
+import { distinctValues, filterJobs, JobBoard, jobMeta, NO_JOB_FILTERS } from "../src/pages/JobBoard";
 import { makeCandidate } from "./fixtures";
 import { makeApplicant, makeJobRow, makeScore } from "./portalFixtures";
 
 vi.mock("../src/api");
 vi.mock("../src/data/jobs");
+vi.mock("../src/data/profile");
 vi.mock("../src/auth/AuthProvider", async (original) => ({
   ...(await original<typeof authModule>()),
   useAuth: vi.fn(),
@@ -93,9 +95,18 @@ describe("JobBoard", () => {
   });
 
   it("filters by text and type", () => {
-    expect(filterJobs(jobsList, "pune", "all").map((j) => j.id)).toEqual(["j1"]);
-    expect(filterJobs(jobsList, "", "internship").map((j) => j.id)).toEqual(["j2"]);
-    expect(filterJobs(jobsList, "", "all")).toHaveLength(2);
+    expect(filterJobs(jobsList, { ...NO_JOB_FILTERS, query: "pune" }).map((j) => j.id)).toEqual(["j1"]);
+    expect(filterJobs(jobsList, { ...NO_JOB_FILTERS, type: "internship" }).map((j) => j.id)).toEqual(["j2"]);
+    expect(filterJobs(jobsList, NO_JOB_FILTERS)).toHaveLength(2);
+  });
+
+  it("filters by team and location, and offers only the values the jobs have", () => {
+    const withTeams = [...jobsList, makeJobRow({ id: "j3", title: "Analyst", location: "Pune", department: "Analytics" })];
+
+    expect(filterJobs(withTeams, { ...NO_JOB_FILTERS, location: "Pune" }).map((j) => j.id)).toEqual(["j1", "j3"]);
+    expect(filterJobs(withTeams, { ...NO_JOB_FILTERS, department: "Analytics" }).map((j) => j.id)).toEqual(["j1", "j3"]);
+    expect(distinctValues(withTeams, "location")).toEqual(["Pune", "Remote"]);
+    expect(distinctValues(withTeams, "department")).not.toContain(null);
   });
 
   it("lists open jobs and narrows them as you type", async () => {
@@ -118,6 +129,48 @@ describe("JobBoard", () => {
 });
 
 describe("ApplyForm", () => {
+  const CANDIDATE = { status: "signedIn", userId: "c1", email: "c@example.com", role: "candidate", fullName: "Riya" } as const;
+
+  function withSavedResume(filename: string | null) {
+    signedInAs(CANDIDATE);
+    vi.mocked(profile.getMyProfile).mockResolvedValue({
+      ok: true,
+      data: { full_name: "Riya", resume_path: filename ? `c1/profile-1.pdf` : null, resume_filename: filename,
+        resume_updated_at: null },
+    });
+  }
+
+  beforeEach(() => withSavedResume(null));
+
+  it("applies with the saved resume by default when there is one", async () => {
+    withSavedResume("Riya resume.pdf");
+    vi.mocked(api.quickApply).mockResolvedValue({ ok: true, data: { id: "app-2" } });
+    const user = userEvent.setup();
+    render(<ApplyForm jobId="job-1" />);
+
+    expect(await screen.findByLabelText("Use my saved resume (Riya resume.pdf)")).toBeChecked();
+    expect(screen.queryByLabelText("Resume file")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Send application" }));
+
+    expect(api.quickApply).toHaveBeenCalledWith("job-1", "");
+    expect(await screen.findByText("Application sent.")).toBeInTheDocument();
+  });
+
+  it("can switch from the saved resume to a different file", async () => {
+    withSavedResume("Riya resume.pdf");
+    vi.mocked(api.applyToJob).mockResolvedValue({ ok: true, data: { id: "app-3" } });
+    const user = userEvent.setup();
+    render(<ApplyForm jobId="job-1" />);
+
+    await user.click(await screen.findByLabelText("Upload a different file"));
+    const resume = new File(["%PDF"], "other.pdf", { type: "application/pdf" });
+    await user.upload(screen.getByLabelText("Resume file"), resume);
+    await user.click(screen.getByRole("button", { name: "Send application" }));
+
+    expect(api.applyToJob).toHaveBeenCalledWith("job-1", resume, "");
+    expect(api.quickApply).not.toHaveBeenCalled();
+  });
+
   it("asks for a file, refuses the wrong type, then sends a good one", async () => {
     vi.mocked(api.applyToJob).mockResolvedValue({ ok: true, data: { id: "app-1" } });
     const user = userEvent.setup({ applyAccept: false });

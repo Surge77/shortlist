@@ -47,7 +47,7 @@ export function JobEditor({ jobId }: { jobId: string | null }) {
       <header className="page-head">
         <div>
           <p className="page-kicker">
-            <Link to={job ? `/hr/jobs/${job.id}` : "/hr"} className="link-button">
+            <Link to={job ? `/hr/jobs/${job.id}` : "/hr/jobs"} className="link-button">
               {job ? "Back to applicants" : "All jobs"}
             </Link>
           </p>

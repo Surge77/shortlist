@@ -49,7 +49,7 @@ describe("HR jobs", () => {
       ],
     });
 
-    visit("/hr");
+    visit("/hr/jobs");
 
     const rows = await screen.findAllByRole("row");
     expect(within(rows[1]).getByRole("link", { name: "Data Engineer" })).toHaveAttribute("href", "/hr/jobs/j1");
@@ -86,7 +86,7 @@ describe("applicants", () => {
     await screen.findByRole("link", { name: "Asha Verma" });
 
     await user.click(screen.getByLabelText("Missing a must-have"));
-    expect(screen.getByText("Showing 1 of 3")).toBeInTheDocument();
+    expect(screen.getByText(/^Showing 1 of 3\./)).toBeInTheDocument();
     await user.click(screen.getByLabelText("Missing a must-have"));
 
     await user.selectOptions(screen.getByLabelText("Fit"), "unscored");
@@ -238,5 +238,105 @@ describe("job editor", () => {
     await user.click(screen.getByRole("button", { name: "Approve requirements" }));
     expect(screen.getByRole("alert")).toHaveTextContent("Add at least one requirement.");
     expect(api.saveRequirements).not.toHaveBeenCalled();
+  });
+});
+
+describe("HR overview", () => {
+  const overviewRows = [
+    { id: "o1", job_id: "j1", stage: "submitted" as const, processing_status: "scored" as const,
+      created_at: "2026-10-12T00:00:00Z", full_name: "Asha Verma", score: { total: 88, band: "strong" as const } },
+    { id: "o2", job_id: "j1", stage: "hired" as const, processing_status: "scored" as const,
+      created_at: "2026-10-11T00:00:00Z", full_name: "Ben Ito", score: { total: 64, band: "possible" as const } },
+  ];
+
+  beforeEach(() => {
+    vi.mocked(jobs.listHrJobs).mockResolvedValue({ ok: true, data: [{ ...makeJobRow({ id: "j1" }), applicant_count: 2 }] });
+    vi.mocked(applications.listAllApplications).mockResolvedValue({ ok: true, data: overviewRows });
+  });
+
+  it("shows headline counts, the stage funnel, newest applications and each job's average", async () => {
+    vi.mocked(api.getAuthOptions).mockResolvedValue({ ok: true, data: { demo: false, hr_email: null, candidate_email: null } });
+    visit("/hr");
+
+    const glance = await screen.findByLabelText("Hiring at a glance");
+    expect(within(glance).getByText("Waiting for review").nextElementSibling).toHaveTextContent("1");
+    expect(within(glance).getByText("Hired").nextElementSibling).toHaveTextContent("1");
+    expect(screen.getByTitle("Hired: 1")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Asha Verma" })).toHaveAttribute("href", "/hr/applications/o1");
+    const jobRow = screen.getByRole("link", { name: "Data Engineer" }).closest("tr");
+    expect(jobRow).not.toBeNull();
+    expect(within(jobRow as HTMLElement).getByText("76")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Reset demo data/ })).not.toBeInTheDocument();
+  });
+
+  it("resets the demo after an on-page confirmation and reports what it removed", async () => {
+    vi.mocked(api.getAuthOptions).mockResolvedValue({ ok: true, data: { demo: true, hr_email: "hr@example.com", candidate_email: null } });
+    vi.mocked(api.resetDemo).mockResolvedValue({
+      ok: true, data: { deleted_applications: 3, deleted_jobs: 1, deleted_accounts: 2, rescoring: 0 },
+    });
+    const user = userEvent.setup();
+    visit("/hr");
+
+    await user.click(await screen.findByRole("button", { name: "Reset demo data…" }));
+    expect(api.resetDemo).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Reset demo data" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Removed 3 applications, 1 jobs and 2 accounts.");
+    expect(jobs.listHrJobs).toHaveBeenCalledTimes(2);
+  });
+
+  it("cancels a reset without calling the server", async () => {
+    vi.mocked(api.getAuthOptions).mockResolvedValue({ ok: true, data: { demo: true, hr_email: null, candidate_email: null } });
+    const user = userEvent.setup();
+    visit("/hr");
+
+    await user.click(await screen.findByRole("button", { name: "Reset demo data…" }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(api.resetDemo).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Reset demo data…" })).toBeInTheDocument();
+  });
+});
+
+describe("compare", () => {
+  const A = "a1b2c3d4-0000-4000-8000-00000000000a";
+  const B = "a1b2c3d4-0000-4000-8000-00000000000b";
+  const detailFor = (id: string, name: string, total: number) => ({
+    ...makeApplicant({ id, full_name: name, score: makeScore({ total }) }),
+    job: { id: "j1", title: "Data Engineer", requirements_version: 1 },
+    candidate_id: "c", resume_path: "c/x.pdf", source_type: "pdf" as const, cover_note: null,
+    extraction: { record: makeCandidate(), experience_months: 30, warnings: [], invalid_fields: [], source_text: null },
+  });
+
+  it("selects two applicants from the list and compares them requirement by requirement", async () => {
+    vi.mocked(jobs.getJob).mockResolvedValue({ ok: true, data: makeJobRow({ id: "j1" }) });
+    vi.mocked(applications.listApplicants).mockResolvedValue({ ok: true, data: [
+      makeApplicant({ id: A, full_name: "Asha Verma" }), makeApplicant({ id: B, full_name: "Ben Ito" }),
+    ] });
+    vi.mocked(applications.getApplicationDetail).mockImplementation(async (id) => ({
+      ok: true, data: id === A ? detailFor(A, "Asha Verma", 81) : detailFor(B, "Ben Ito", 55),
+    }));
+    const user = userEvent.setup();
+    visit("/hr/jobs/j1");
+
+    const compare = await screen.findByRole("button", { name: "Compare selected (0)" });
+    expect(compare).toBeDisabled();
+    await user.click(screen.getByLabelText("Compare Asha Verma"));
+    await user.click(screen.getByLabelText("Compare Ben Ito"));
+    await user.click(screen.getByRole("button", { name: "Compare selected (2)" }));
+
+    expect(window.location.search).toBe(`?ids=${A},${B}`);
+    expect(await screen.findByRole("heading", { name: "Compare candidates: Data Engineer" })).toBeInTheDocument();
+    const kubernetes = screen.getByRole("rowheader", { name: /Kubernetes/ }).closest("tr") as HTMLElement;
+    expect(within(kubernetes).getAllByText("Missing")).toHaveLength(2);
+    expect(screen.getAllByText("2 yrs 6 mos")).toHaveLength(2);
+    expect(screen.getByText("81")).toBeInTheDocument();
+  });
+
+  it("explains what to do when fewer than two applications can be compared", async () => {
+    vi.mocked(applications.getApplicationDetail).mockResolvedValue({ ok: true, data: null });
+    visit(`/hr/jobs/j1/compare?ids=${A}`);
+
+    expect(await screen.findByText(/Choose two or three applicants/)).toBeInTheDocument();
   });
 });

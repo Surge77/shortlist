@@ -17,10 +17,11 @@ import {
   type ApplicantFilters,
   type SortKey,
 } from "../../hr/applicants";
+import { compareLink, MAX_COMPARE } from "../../hr/compare";
 import { useBlindMode } from "../../hr/useBlindMode";
 import { usePolling } from "../../hr/usePolling";
 import { BAND_LABEL, formatDate, STAGE_LABEL, STAGES } from "../../labels";
-import { Link } from "../../router";
+import { Link, navigate } from "../../router";
 import { useLoad } from "../../useLoad";
 
 function downloadCsv(filename: string, csv: string) {
@@ -60,7 +61,7 @@ function JobHeader({ job }: { job: Job }) {
     <header className="page-head">
       <div>
         <p className="page-kicker">
-          <Link to="/hr" className="link-button">All jobs</Link>
+          <Link to="/hr/jobs" className="link-button">All jobs</Link>
         </p>
         <h1 className="page-title">{job.title}</h1>
       </div>
@@ -76,6 +77,7 @@ function ApplicantTable({ job, rows }: { job: Job; rows: Applicant[] }) {
   const [filters, setFilters] = useState<ApplicantFilters>(NO_FILTERS);
   const [sort, setSort] = useState<SortKey>("score");
   const [isBlind, setIsBlind] = useBlindMode();
+  const [selected, setSelected] = useState<string[]>([]);
   const counts = stageCounts(rows);
   const visible = sortApplicants(filterApplicants(rows, filters, isBlind), sort);
   const staleCount = rows.filter((row) => isStale(row, job.requirements_version)).length;
@@ -137,16 +139,23 @@ function ApplicantTable({ job, rows }: { job: Job; rows: Applicant[] }) {
           <input type="checkbox" checked={isBlind} onChange={(e) => setIsBlind(e.target.checked)} />
           Blind review
         </label>
-        <button type="button" className="btn-outline ml-auto"
+        <button type="button" className="btn-outline ml-auto" disabled={selected.length < 2}
+          onClick={() => navigate(compareLink(job.id, selected))}>
+          Compare selected ({selected.length})
+        </button>
+        <button type="button" className="btn-outline"
           onClick={() => downloadCsv(`${job.title} applicants.csv`, applicantsCsv(visible, isBlind))}>
           Export CSV
         </button>
       </div>
-      <p className="meta mb-2" aria-live="polite">Showing {visible.length} of {rows.length}</p>
+      <p className="meta mb-2" aria-live="polite">
+        Showing {visible.length} of {rows.length}. Tick up to {MAX_COMPARE} to compare them side by side.
+      </p>
       <div className="ledger-wrap">
         <table className="ledger">
           <thead>
             <tr>
+              <th scope="col"><span className="sr-only">Compare</span></th>
               <th scope="col">Candidate</th>
               <th scope="col">Score</th>
               <th scope="col">Missing must-haves</th>
@@ -157,6 +166,14 @@ function ApplicantTable({ job, rows }: { job: Job; rows: Applicant[] }) {
           <tbody>
             {visible.map((row) => (
               <tr key={row.id}>
+                <td>
+                  <input type="checkbox" aria-label={`Compare ${candidateLabel(row, isBlind)}`}
+                    checked={selected.includes(row.id)}
+                    disabled={!selected.includes(row.id) && selected.length >= MAX_COMPARE}
+                    onChange={(e) => setSelected(e.target.checked
+                      ? [...selected, row.id]
+                      : selected.filter((id) => id !== row.id))} />
+                </td>
                 <td>
                   <Link to={`/hr/applications/${row.id}`} className="row-title">{candidateLabel(row, isBlind)}</Link>
                 </td>

@@ -239,3 +239,39 @@
   color: var(--text);
   white-space: pre-wrap;
 }
+
+/* Stage funnel on the HR overview: one series, so each bar is labelled in text and the
+   bar itself only shows proportion. Square ends, like every other rule on the galley. */
+.funnel {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.funnel-row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.funnel-label {
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.funnel-track {
+  height: 0.75rem;
+  background: var(--faint);
+}
+
+.funnel-bar {
+  display: block;
+  height: 100%;
+  background: var(--chart-bar);
+}
+
+.funnel-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}

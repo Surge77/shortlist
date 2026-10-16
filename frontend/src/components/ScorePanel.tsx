@@ -2,7 +2,7 @@ import type { RequirementResult, Score, ScoreCategory } from "../data/types";
 import { formatScore, VERDICT_LABEL } from "../labels";
 import { BandTag } from "./Tags";
 
-const VERDICT_MARK = { met: "✓", partial: "½", missing: "✕" } as const;
+export const VERDICT_MARK = { met: "✓", partial: "½", missing: "✕" } as const;
 const LIST_CATEGORIES: { category: ScoreCategory; title: string }[] = [
   { category: "must_have", title: "Must-have skills" },
   { category: "nice_to_have", title: "Nice-to-have skills" },
