@@ -1,0 +1,24 @@
+ROHAN DESAI
+Product Manager | Mumbai, India
+rohan.desai@example.com | +91 90000 67890 | linkedin.com/in/rohan-desai-example
+
+SUMMARY
+Product manager with five years in product and two in analytics, leading B2B SaaS teams from research to launch.
+
+EXPERIENCE
+Product Manager, Ledgerly, Mumbai (Mar 2022 - Present)
+- Own the roadmap for invoicing and payments used by 9,000 small businesses
+- Ran 40 user research interviews that led to a redesigned onboarding, lifting activation by 22%
+- Run A/B tests on pricing pages and write SQL to size opportunities
+- Align sales, support and engineering stakeholders in a monthly roadmap review
+Associate Product Manager, Brightdesk Software, Pune (Jul 2020 - Feb 2022)
+- Shipped a self-serve reporting module; managed the backlog in Jira
+Business Analyst, Brightdesk Software, Pune (Jul 2018 - Jun 2020)
+- Built Excel and Tableau reports for the leadership team
+
+EDUCATION
+MBA, Sahyadri School of Management, Pune, 2016 - 2018
+B.Com., Konkan College of Commerce, Mumbai, 2013 - 2016
+
+SKILLS
+Product roadmapping, user research, A/B testing, SQL, Jira, stakeholder management, Tableau, Excel

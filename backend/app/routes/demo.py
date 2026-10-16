@@ -5,15 +5,22 @@ fictional data only, which is why the mode is off unless deliberately turned on.
 """
 
 import re
+from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Request
 from pydantic import BaseModel, field_validator
 
+from app import pipeline
+from app.auth import HrUser, Repo
 from app.config import DemoSettings, demo_settings
 from app.demo.accounts import DemoAccounts, SupabaseDemoAccounts
+from app.demo.fixtures import load_fixtures
+from app.demo.reset import restore
+from app.demo.store import DemoStore, SupabaseDemoStore
 from app.errors import UserFacingError
-from app.rate_limit import DEMO_LOGIN_LIMIT
+from app.gemini import JsonGenerator, get_generator
+from app.rate_limit import DEMO_LOGIN_LIMIT, DEMO_RESET_LIMIT
 from app.supabase_rest import SupabaseNotConfigured, get_rest
 
 router = APIRouter(prefix="/api")
@@ -45,6 +52,13 @@ class DemoLoginRequest(BaseModel):
 class DemoLoginReply(BaseModel):
     # Single use and short-lived; exchanged by the browser for its own session.
     token_hash: str
+
+
+class ResetReply(BaseModel):
+    deleted_applications: int
+    deleted_jobs: int
+    deleted_accounts: int
+    rescoring: int
 
 
 class AuthOptions(BaseModel):
@@ -79,6 +93,28 @@ async def options(demo: Demo) -> AuthOptions:
         return AuthOptions(demo=False, hr_email=None, candidate_email=None)
     hr_email = min(demo.hr_emails) if demo.hr_emails else None
     return AuthOptions(demo=True, hr_email=hr_email, candidate_email=demo.candidate_email)
+
+
+def get_demo_store() -> DemoStore:
+    rest = get_rest()
+    if rest is None:
+        raise SupabaseNotConfigured()
+    return SupabaseDemoStore(rest)
+
+
+@router.post("/demo/reset", response_model=ResetReply)
+async def reset_demo(user: HrUser, demo: Demo, store: Annotated[DemoStore, Depends(get_demo_store)], repo: Repo,
+                     generator: Annotated[JsonGenerator, Depends(get_generator)],
+                     background: BackgroundTasks) -> ResetReply:
+    if demo is None:
+        raise DemoLoginOff()
+    DEMO_RESET_LIMIT.check(user.id)
+    report = await restore(store, load_fixtures(), demo.hr_emails, datetime.now(UTC))
+    # Normally empty: only a seeded application someone removed from the database needs it.
+    if report.needs_scoring:
+        background.add_task(pipeline.rescore_all, report.needs_scoring, repo, generator)
+    return ResetReply(deleted_applications=report.deleted_applications, deleted_jobs=report.deleted_jobs,
+                      deleted_accounts=report.deleted_accounts, rescoring=len(report.needs_scoring))
 
 
 @router.post("/auth/demo-login", response_model=DemoLoginReply)

@@ -1,0 +1,175 @@
+{
+  "hr": { "email": "hr.demo@example.com", "full_name": "Priya Sharma" },
+  "jobs": [
+    {
+      "slug": "data-analyst", "title": "Data Analyst", "department": "Analytics", "location": "Pune",
+      "employment_type": "full_time", "days_ago": 30,
+      "description": "Turn sales and finance data into dashboards and reports that teams use every week. You will write SQL, automate recurring reports in Python, and build dashboards in Power BI or Tableau. Two years of analytics experience and a degree in statistics, mathematics or computer science are required. Experience with dbt or Airflow is a plus.",
+      "requirements": { "must_have": ["SQL", "Python", "Power BI or Tableau"], "nice_to_have": ["dbt", "Airflow"], "min_years": 2,
+        "education_level": "bachelor", "education_fields": ["Statistics", "Mathematics", "Computer Science"], "certifications": [] }
+    },
+    {
+      "slug": "backend-engineer", "title": "Backend Engineer (Python)", "department": "Platform", "location": "Remote",
+      "employment_type": "full_time", "days_ago": 28,
+      "description": "Design and run the APIs behind our products. You will build services with Python and FastAPI or Django, model data in PostgreSQL and design clean REST APIs. We ask for three years of backend experience and a computer science degree. Docker and AWS experience is preferred.",
+      "requirements": { "must_have": ["Python", "FastAPI or Django", "PostgreSQL", "REST API design"], "nice_to_have": ["Docker", "AWS"],
+        "min_years": 3, "education_level": "bachelor", "education_fields": ["Computer Science"], "certifications": [] }
+    },
+    {
+      "slug": "ml-intern", "title": "Machine Learning Intern", "department": "Research", "location": "Bengaluru",
+      "employment_type": "internship", "days_ago": 26,
+      "description": "Six-month internship building and evaluating models for customer data. You need Python, pandas and scikit-learn, and should be studying for a bachelor's degree. PyTorch or NLP project work is a bonus.",
+      "requirements": { "must_have": ["Python", "pandas", "scikit-learn"], "nice_to_have": ["PyTorch", "NLP"], "min_years": null,
+        "education_level": "bachelor", "education_fields": [], "certifications": [] }
+    },
+    {
+      "slug": "frontend-engineer", "title": "Frontend Engineer (React)", "department": "Product Engineering", "location": "Bengaluru",
+      "employment_type": "full_time", "days_ago": 24,
+      "description": "Build the screens our customers use every day. You will write React and TypeScript, keep our CSS and component library consistent, and test what you ship. Two years of frontend experience and a degree in computer science or IT are required. Next.js and Testing Library experience help.",
+      "requirements": { "must_have": ["React", "TypeScript", "CSS"], "nice_to_have": ["Next.js", "Testing Library"], "min_years": 2,
+        "education_level": "bachelor", "education_fields": ["Computer Science", "Information Technology"], "certifications": [] }
+    },
+    {
+      "slug": "devops-engineer", "title": "DevOps Engineer", "department": "Platform", "location": "Hyderabad",
+      "employment_type": "full_time", "days_ago": 23,
+      "description": "Keep our services fast, safe and boring to deploy. You will run Linux servers and Kubernetes clusters, package services with Docker and own the CI/CD pipelines. Three years of experience are required; Terraform and AWS experience are preferred, and an AWS certification is valued.",
+      "requirements": { "must_have": ["Linux", "Docker", "Kubernetes", "CI/CD pipelines"], "nice_to_have": ["Terraform", "AWS"], "min_years": 3,
+        "education_level": "bachelor", "education_fields": [], "certifications": ["AWS Certified Solutions Architect or Developer"] }
+    },
+    {
+      "slug": "data-engineer", "title": "Data Engineer", "department": "Analytics", "location": "Remote",
+      "employment_type": "full_time", "days_ago": 22,
+      "description": "Build the pipelines that feed our analytics and machine learning. You will write Python and SQL, run Apache Spark jobs and orchestrate them with Airflow. Three years of data engineering experience and an engineering or computer science degree are required. Kafka and dbt are a plus.",
+      "requirements": { "must_have": ["Python", "SQL", "Apache Spark", "Airflow"], "nice_to_have": ["Kafka", "dbt"], "min_years": 3,
+        "education_level": "bachelor", "education_fields": ["Computer Science", "Engineering"], "certifications": [] }
+    },
+    {
+      "slug": "qa-engineer", "title": "QA Automation Engineer", "department": "Quality Engineering", "location": "Pune",
+      "employment_type": "full_time", "days_ago": 21,
+      "description": "Make releases safe by automating our web and API tests. You will write end-to-end tests with Selenium or Playwright in Python or Java, test REST APIs, and run the suites in CI/CD. Two years of experience and an ISTQB certification are expected; load testing with JMeter is a plus.",
+      "requirements": { "must_have": ["Selenium or Playwright", "Python or Java", "API testing"], "nice_to_have": ["CI/CD", "JMeter"], "min_years": 2,
+        "education_level": "bachelor", "education_fields": [], "certifications": ["ISTQB Foundation Level"] }
+    },
+    {
+      "slug": "product-manager", "title": "Product Manager", "department": "Product", "location": "Mumbai",
+      "employment_type": "full_time", "days_ago": 20,
+      "description": "Own the roadmap for our small-business payments product. You will run user research, size opportunities with SQL and keep sales, support and engineering aligned. Four years of product experience and a bachelor's degree are required. A/B testing and Jira experience are a plus.",
+      "requirements": { "must_have": ["Product roadmapping", "User research", "SQL", "Stakeholder management"], "nice_to_have": ["A/B testing", "Jira"],
+        "min_years": 4, "education_level": "bachelor", "education_fields": [], "certifications": [] }
+    },
+    {
+      "slug": "ux-designer", "title": "UX/UI Designer", "department": "Design", "location": "Bengaluru",
+      "employment_type": "contract", "days_ago": 19,
+      "description": "A twelve-month contract to redesign our booking experience. You will run user research, prototype in Figma and grow our design system. Two years of product design experience and a degree in design or human-computer interaction are required. Accessibility knowledge and some HTML and CSS are a plus.",
+      "requirements": { "must_have": ["Figma", "User research", "Prototyping", "Design systems"], "nice_to_have": ["Accessibility (WCAG)", "HTML and CSS"],
+        "min_years": 2, "education_level": "bachelor", "education_fields": ["Design", "Human-Computer Interaction"], "certifications": [] }
+    },
+    {
+      "slug": "digital-marketing", "title": "Digital Marketing Specialist", "department": "Marketing", "location": "Mumbai",
+      "employment_type": "full_time", "days_ago": 18,
+      "description": "Grow traffic and sign-ups for our home products brand. You will own SEO, run Google Ads campaigns, report in Google Analytics and plan content. Two years of digital marketing experience and a Google Ads certification are required. HubSpot and email marketing experience are a plus.",
+      "requirements": { "must_have": ["SEO", "Google Ads", "Google Analytics", "Content marketing"], "nice_to_have": ["HubSpot", "Email marketing"],
+        "min_years": 2, "education_level": "bachelor", "education_fields": [], "certifications": ["Google Ads certification"] }
+    },
+    {
+      "slug": "sdr", "title": "Sales Development Representative", "department": "Sales", "location": "Delhi NCR",
+      "employment_type": "full_time", "days_ago": 16,
+      "description": "Start conversations with businesses that need our software. You will prospect B2B accounts, make cold calls and keep every lead up to date in the CRM. One year in a sales or customer-facing role is required. SaaS sales and LinkedIn Sales Navigator experience help.",
+      "requirements": { "must_have": ["B2B prospecting", "CRM (Salesforce or HubSpot)", "Cold calling"], "nice_to_have": ["SaaS sales", "LinkedIn Sales Navigator"],
+        "min_years": 1, "education_level": "bachelor", "education_fields": [], "certifications": [] }
+    },
+    {
+      "slug": "financial-analyst", "title": "Financial Analyst", "department": "Finance", "location": "Mumbai",
+      "employment_type": "full_time", "days_ago": 15,
+      "description": "Help leadership plan and track the business. You will build financial models in Excel, prepare monthly variance analysis and support budgeting. Two years of finance experience and a degree in commerce, finance or economics are required; CFA Level 1 is valued. Power BI and SAP are a plus.",
+      "requirements": { "must_have": ["Financial modelling", "Excel", "Variance analysis", "Accounting fundamentals"], "nice_to_have": ["Power BI", "SAP"],
+        "min_years": 2, "education_level": "bachelor", "education_fields": ["Commerce", "Finance", "Economics"], "certifications": ["CFA Level 1"] }
+    },
+    {
+      "slug": "talent-acquisition", "title": "Talent Acquisition Specialist", "department": "People", "location": "Pune",
+      "employment_type": "full_time", "days_ago": 14,
+      "description": "Hire the people who build our company. You will run recruitment end to end, source candidates, interview them and keep the applicant tracking system tidy. Two years of recruitment experience are required. Employer branding and HR analytics experience are a plus.",
+      "requirements": { "must_have": ["End-to-end recruitment", "Candidate sourcing", "Interviewing", "Applicant tracking system"],
+        "nice_to_have": ["Employer branding", "HR analytics"], "min_years": 2, "education_level": "bachelor", "education_fields": [], "certifications": [] }
+    },
+    {
+      "slug": "support-specialist", "title": "Customer Support Specialist", "department": "Customer Success", "location": "Remote",
+      "employment_type": "part_time", "days_ago": 12,
+      "description": "Part-time, four hours a day. Answer customer questions by email and chat, solve problems in our ticketing tool and write help articles. You need clear written English and experience with Zendesk or Freshdesk. Basic SQL and Hindi are a plus.",
+      "requirements": { "must_have": ["Customer support", "Zendesk or Freshdesk", "Written English communication"], "nice_to_have": ["SQL", "Hindi"],
+        "min_years": null, "education_level": null, "education_fields": [], "certifications": [] }
+    },
+    {
+      "slug": "supply-chain-analyst", "title": "Supply Chain Analyst", "department": "Operations", "location": "Chennai",
+      "employment_type": "contract", "days_ago": 10,
+      "description": "A six-month contract to improve stock planning across our warehouses. You will forecast demand, plan inventory and analyse it in Excel and SQL. Two years of experience and an engineering or supply chain degree are required. SAP and Power BI are a plus.",
+      "requirements": { "must_have": ["Inventory planning", "Demand forecasting", "Excel", "SQL"], "nice_to_have": ["SAP", "Power BI"],
+        "min_years": 2, "education_level": "bachelor", "education_fields": ["Engineering", "Supply Chain Management"], "certifications": [] }
+    },
+    {
+      "slug": "security-analyst", "title": "Cybersecurity Analyst", "department": "Security", "location": "Hyderabad",
+      "employment_type": "full_time", "days_ago": 8,
+      "description": "Protect our customers and systems. You will monitor alerts in our SIEM, respond to incidents and review network security controls. Two years of security operations experience, a computer science degree and CompTIA Security+ are required. Python scripting and cloud security are a plus.",
+      "requirements": { "must_have": ["SIEM (Splunk or QRadar)", "Incident response", "Network security"], "nice_to_have": ["Python", "Cloud security"],
+        "min_years": 2, "education_level": "bachelor", "education_fields": ["Computer Science"], "certifications": ["CompTIA Security+"] }
+    },
+    {
+      "slug": "data-scientist", "title": "Data Scientist", "department": "Research", "location": "Bengaluru",
+      "employment_type": "full_time", "days_ago": 2, "status": "draft",
+      "description": "Build models that predict which customers will buy, stay or leave. You will explore data in Python and SQL, train and evaluate models with scikit-learn or PyTorch, and explain results to product teams. We ask for three years of data science experience and a master's degree in statistics, computer science or a related field. Experience with experimentation and MLOps tools such as MLflow is a plus."
+    }
+  ],
+  "candidates": [
+    { "slug": "riya", "email": "riya.demo@example.com", "full_name": "Riya Kulkarni", "saved_resume": true },
+    { "slug": "arjun", "email": "arjun.mehta@example.com", "full_name": "Arjun Mehta" },
+    { "slug": "sneha", "email": "sneha.iyer@example.com", "full_name": "Sneha Iyer" },
+    { "slug": "karan", "email": "karan.singh@example.com", "full_name": "Karan Singh" },
+    { "slug": "meera", "email": "meera.nair@example.com", "full_name": "Meera Nair" },
+    { "slug": "rohan", "email": "rohan.desai@example.com", "full_name": "Rohan Desai" },
+    { "slug": "ananya", "email": "ananya.rao@example.com", "full_name": "Ananya Rao" },
+    { "slug": "vikram", "email": "vikram.joshi@example.com", "full_name": "Vikram Joshi" },
+    { "slug": "fatima", "email": "fatima.shaikh@example.com", "full_name": "Fatima Shaikh" },
+    { "slug": "dev", "email": "dev.malhotra@example.com", "full_name": "Dev Malhotra" },
+    { "slug": "aditya", "email": "aditya.kumar@example.com", "full_name": "Aditya Kumar" }
+  ],
+  "applications": [
+    { "candidate": "riya", "job": "data-analyst", "days_ago": 9, "stages": ["reviewing"],
+      "cover_note": "I build Power BI dashboards and automate reporting with SQL and Python today, and would love to do it for your sales team.",
+      "notes": ["Strong dashboard portfolio. Ask about dbt in the first call."] },
+    { "candidate": "riya", "job": "data-engineer", "days_ago": 6, "stages": [] },
+    { "candidate": "arjun", "job": "backend-engineer", "days_ago": 20, "stages": ["reviewing", "shortlisted"],
+      "cover_note": "Six years of FastAPI and PostgreSQL in payments. Happy to walk through the payouts API design.",
+      "notes": ["Clear evidence for every must-have.", "Technical round booked for Thursday."] },
+    { "candidate": "arjun", "job": "devops-engineer", "days_ago": 12, "stages": ["reviewing"] },
+    { "candidate": "sneha", "job": "frontend-engineer", "days_ago": 17, "stages": ["reviewing", "shortlisted"],
+      "notes": ["Accessible component work stands out. Portfolio review next."] },
+    { "candidate": "sneha", "job": "ux-designer", "days_ago": 11, "stages": ["reviewing"],
+      "notes": ["Strong Figma hand-off experience but no research or design degree. Possible fit for a junior role."] },
+    { "candidate": "karan", "job": "ml-intern", "days_ago": 15, "stages": ["reviewing", "shortlisted"],
+      "cover_note": "My loan default and sentiment projects are on GitHub; I can start in January." },
+    { "candidate": "karan", "job": "data-analyst", "days_ago": 14, "stages": ["reviewing", "rejected"],
+      "notes": ["Still a student and no Power BI or Tableau. Pointed him to the internship instead."] },
+    { "candidate": "meera", "job": "data-engineer", "days_ago": 19, "stages": ["reviewing", "shortlisted", "hired"],
+      "notes": ["Excellent Spark and Airflow depth.", "Offer accepted; starts on the 1st."] },
+    { "candidate": "meera", "job": "backend-engineer", "days_ago": 18, "stages": ["reviewing"] },
+    { "candidate": "rohan", "job": "product-manager", "days_ago": 16, "stages": ["reviewing", "shortlisted"],
+      "notes": ["Good research-to-launch story on onboarding."] },
+    { "candidate": "rohan", "job": "data-analyst", "days_ago": 13, "stages": [] },
+    { "candidate": "ananya", "job": "digital-marketing", "days_ago": 12, "stages": ["reviewing"],
+      "cover_note": "I grew organic traffic 140% at Saffron Living and run a 15 lakh monthly Google Ads budget." },
+    { "candidate": "ananya", "job": "sdr", "days_ago": 7, "stages": [] },
+    { "candidate": "vikram", "job": "financial-analyst", "days_ago": 11, "stages": ["reviewing", "shortlisted"],
+      "notes": ["Model for the plant investment is a great case study to discuss."] },
+    { "candidate": "vikram", "job": "supply-chain-analyst", "days_ago": 6, "stages": [] },
+    { "candidate": "fatima", "job": "qa-engineer", "days_ago": 15, "stages": ["reviewing"] },
+    { "candidate": "fatima", "job": "security-analyst", "days_ago": 5, "stages": ["reviewing", "rejected"],
+      "notes": ["No SIEM or incident response experience yet."] },
+    { "candidate": "dev", "job": "support-specialist", "days_ago": 10, "stages": ["reviewing", "shortlisted"],
+      "cover_note": "Three years in Zendesk with a 96% satisfaction score; part-time suits me well." },
+    { "candidate": "dev", "job": "talent-acquisition", "days_ago": 12, "stages": ["withdrawn"] },
+    { "candidate": "dev", "job": "sdr", "days_ago": 8, "stages": ["reviewing"] },
+    { "candidate": "aditya", "job": "security-analyst", "days_ago": 6, "stages": [],
+      "cover_note": "Security+ certified, three years in a SOC with Splunk and QRadar." },
+    { "candidate": "aditya", "job": "devops-engineer", "days_ago": 9, "stages": ["reviewing"] }
+  ]
+}

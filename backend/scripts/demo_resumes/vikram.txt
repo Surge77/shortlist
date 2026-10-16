@@ -1,0 +1,24 @@
+VIKRAM JOSHI
+Financial Analyst | Mumbai, India
+vikram.joshi@example.com | +91 90000 89012
+
+SUMMARY
+Financial analyst with two and a half years in FP&A, building models and monthly variance reports.
+
+EXPERIENCE
+Financial Analyst, Meridian Foods, Mumbai (Apr 2024 - Present)
+- Built a three-statement financial model for a new plant; the board used it to approve the investment
+- Prepare monthly budget-versus-actual variance analysis for 12 cost centres
+- Automated the reporting pack with Excel Power Query and Power BI
+Finance Associate, Greystone Advisors, Mumbai (Apr 2023 - Mar 2024)
+- Supported audits; reconciled ledgers and prepared journal entries in SAP
+- Tracked inventory valuation and stock movements for two warehouses
+
+EDUCATION
+B.Com. Accounting and Finance, Konkan College of Commerce, Mumbai, 2019 - 2022
+
+SKILLS
+Financial modelling, advanced Excel, variance analysis, accounting, budgeting, Power BI, SAP FI, forecasting
+
+CERTIFICATIONS
+CFA Level 1 (passed), CFA Institute, 2024

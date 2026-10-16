@@ -1,0 +1,22 @@
+MEERA NAIR
+Data Engineer | Kochi, India (open to remote)
+meera.nair@example.com | +91 90000 56789 | linkedin.com/in/meera-nair-example
+
+SUMMARY
+Data engineer with four years of building batch and streaming pipelines for analytics teams.
+
+EXPERIENCE
+Data Engineer, Tidewater Commerce, Kochi (Jan 2023 - Present)
+- Built Apache Spark jobs that process 3 TB of order events a day
+- Orchestrate 120 Airflow DAGs; reduced failed runs by 60% with retries and data checks
+- Introduced dbt models for the finance mart and documented every table
+- Stream clickstream data through Kafka into the warehouse with under 5 minutes of delay
+Associate Data Engineer, Harborline Insurance, Kochi (Jun 2021 - Dec 2022)
+- Wrote Python and SQL ETL from policy systems into PostgreSQL and BigQuery
+- Built internal REST endpoints in Flask to expose data quality reports
+
+EDUCATION
+B.Tech. Computer Science and Engineering, Malabar College of Engineering, 2017 - 2021
+
+SKILLS
+Python, SQL, Apache Spark, Airflow, Kafka, dbt, PostgreSQL, BigQuery, Docker, Flask

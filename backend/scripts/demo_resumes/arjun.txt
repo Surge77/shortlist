@@ -1,0 +1,26 @@
+ARJUN MEHTA
+Senior Backend Engineer | Bengaluru, India
+arjun.mehta@example.com | +91 90000 23456 | github.com/arjun-mehta-example
+
+SUMMARY
+Backend engineer with six years of building Python services, APIs and data models for payments and logistics products.
+
+EXPERIENCE
+Senior Backend Engineer, Bluepeak Payments, Bengaluru (Apr 2022 - Present)
+- Designed REST APIs in FastAPI for a payouts service handling 2 million requests a day
+- Modelled ledgers in PostgreSQL and cut slow queries by 70% with indexing and partitioning
+- Moved services to Docker containers deployed on AWS ECS with GitHub Actions pipelines
+Backend Engineer, Trailhead Logistics, Pune (Jul 2020 - Mar 2022)
+- Built Django services for shipment tracking and a public partner API
+- Added Redis caching and Celery workers for label generation
+Software Engineer, Quillsoft Technologies, Pune (Aug 2019 - Jun 2020)
+- Maintained Python ETL jobs and internal admin tools
+
+EDUCATION
+B.E. Computer Science, Western Institute of Technology, Pune, 2015 - 2019
+
+SKILLS
+Python, FastAPI, Django, PostgreSQL, Redis, REST API design, Docker, AWS (ECS, RDS, S3), GitHub Actions, Linux
+
+CERTIFICATIONS
+AWS Certified Developer - Associate, 2023

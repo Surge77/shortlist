@@ -99,7 +99,7 @@ class SupabaseRest:
         rows = response.json()
         return rows if isinstance(rows, list) else []
 
-    async def insert(self, table: str, row: dict[str, Any], *, upsert: bool = False) -> None:
+    async def insert(self, table: str, row: dict[str, Any] | list[dict[str, Any]], *, upsert: bool = False) -> None:
         prefer = "return=minimal" + (",resolution=merge-duplicates" if upsert else "")
         response = await self._send("POST", f"/rest/v1/{table}", json=row, headers={"Prefer": prefer})
         self._raise_for(response)
@@ -124,7 +124,10 @@ class SupabaseRest:
         return response.content
 
     async def remove(self, path: str) -> None:
-        response = await self._send("DELETE", f"/storage/v1/object/{RESUME_BUCKET}", json={"prefixes": [path]})
+        await self.remove_many([path])
+
+    async def remove_many(self, paths: list[str]) -> None:
+        response = await self._send("DELETE", f"/storage/v1/object/{RESUME_BUCKET}", json={"prefixes": paths})
         if response.status_code != HTTP_NOT_FOUND:
             self._raise_for(response)
 

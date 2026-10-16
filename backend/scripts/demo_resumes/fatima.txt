@@ -1,0 +1,24 @@
+FATIMA SHAIKH
+QA Automation Engineer | Pune, India
+fatima.shaikh@example.com | +91 90000 90123 | github.com/fatima-shaikh-example
+
+SUMMARY
+QA engineer with three years of automating web and API tests and keeping release pipelines green.
+
+EXPERIENCE
+QA Automation Engineer, Orbitline Travel, Pune (Feb 2024 - Present)
+- Built a Playwright and Python test suite of 600 end-to-end tests that runs on every pull request
+- Automated REST API testing with pytest and Postman collections
+- Added the suites to Jenkins CI/CD; release regressions fell by half
+Software Test Engineer, Quillsoft Technologies, Pune (Jul 2022 - Jan 2024)
+- Wrote Selenium tests in Java for the billing portal
+- Ran load tests with JMeter before each major release
+
+EDUCATION
+B.E. Electronics and Telecommunication, Western Institute of Technology, Pune, 2018 - 2022
+
+SKILLS
+Playwright, Selenium, Python, Java, pytest, API testing, Postman, Jenkins, JMeter, Git, basic network concepts
+
+CERTIFICATIONS
+ISTQB Certified Tester Foundation Level, 2023
