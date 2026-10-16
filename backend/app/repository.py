@@ -8,11 +8,10 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any, Literal, Protocol
 
-from app.config import supabase_settings
 from app.requirements import JobRequirements, Weights
 from app.schemas import Candidate, SourceType
 from app.scoring import ScoreResult
-from app.supabase_rest import SupabaseNotConfigured, SupabaseRest
+from app.supabase_rest import SupabaseNotConfigured, SupabaseRest, get_rest
 
 Role = Literal["candidate", "hr"]
 JobStatus = Literal["draft", "open", "closed"]
@@ -188,5 +187,4 @@ class SupabaseRepository:
 
 @lru_cache(maxsize=1)
 def get_repository() -> Repository:
-    settings = supabase_settings()
-    return SupabaseRepository(SupabaseRest(settings) if settings else None)
+    return SupabaseRepository(get_rest())

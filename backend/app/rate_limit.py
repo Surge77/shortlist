@@ -41,3 +41,6 @@ class RateLimiter:
 # Generous for real use, tight enough that one account cannot drain the shared quota.
 APPLY_LIMIT = RateLimiter(max_calls=10, window_seconds=HOUR_SECONDS)
 GEMINI_HR_LIMIT = RateLimiter(max_calls=60, window_seconds=HOUR_SECONDS)
+# Per client address. A classroom shares one address, so this allows a room to sign in
+# and out freely while stopping a script from creating accounts in bulk.
+DEMO_LOGIN_LIMIT = RateLimiter(max_calls=60, window_seconds=600)

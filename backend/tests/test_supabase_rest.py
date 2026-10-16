@@ -197,3 +197,85 @@ def test_the_repository_round_trips_applications_and_extractions():
     assert processing == {"processing_status": "failed", "processing_error": "Not a resume"}
     assert requirements["requirements_version"] == 4 and requirements["requirements"]["must_have"] == ["SQL"]
     assert "neq.withdrawn" in str(recorder.requests[3].url)
+
+
+def test_creating_a_demo_account_sends_it_confirmed_with_its_name():
+    rest, recorder = client_with(lambda _: httpx.Response(200, json={"id": "u1"}))
+
+    run(rest.admin_create_user("asha@example.com", "Asha Verma"))
+
+    request = recorder.requests[0]
+    assert (request.method, request.url.path) == ("POST", "/auth/v1/admin/users")
+    assert json.loads(request.content) == {"email": "asha@example.com", "email_confirm": True,
+                                           "user_metadata": {"full_name": "Asha Verma"}}
+
+
+@pytest.mark.parametrize(("status", "body"), [
+    (422, {"error_code": "email_exists", "msg": "A user with this email address has already been registered"}),
+    (400, {"msg": "A user with this email address has already been registered"}),
+])
+def test_an_existing_account_is_left_alone(status, body):
+    rest, _ = client_with(lambda _: httpx.Response(status, json=body))
+
+    run(rest.admin_create_user("asha@example.com", None))
+
+
+def test_other_account_errors_are_raised():
+    rest, _ = client_with(lambda _: httpx.Response(422, json={"error_code": "email_address_invalid"}))
+
+    with pytest.raises(SupabaseError):
+        run(rest.admin_create_user("asha@example.com", None))
+
+
+def test_a_magic_link_gives_the_user_id_and_hashed_token():
+    rest, recorder = client_with(lambda _: httpx.Response(200, json={
+        "id": "u1", "email": "asha@example.com", "hashed_token": "abc123", "action_link": "https://x"}))
+
+    link = run(rest.admin_magic_link("asha@example.com"))
+
+    assert (link.user_id, link.token_hash) == ("u1", "abc123")
+    assert json.loads(recorder.requests[0].content) == {"type": "magiclink", "email": "asha@example.com"}
+
+
+def test_a_magic_link_reply_without_a_token_is_an_error():
+    rest, _ = client_with(lambda _: httpx.Response(200, json={"id": "u1"}))
+
+    with pytest.raises(SupabaseError):
+        run(rest.admin_magic_link("asha@example.com"))
+
+
+def test_listing_users_follows_pages_and_lowercases_emails(monkeypatch):
+    monkeypatch.setattr("app.supabase_rest.USERS_PER_PAGE", 2)
+    pages = {"1": [{"id": "a", "email": "A@example.com"}, {"id": "b", "email": "b@example.com"}],
+             "2": [{"id": "c", "email": None}]}
+    rest, recorder = client_with(lambda r: httpx.Response(200, json={"users": pages[r.url.params["page"]]}))
+
+    users = run(rest.admin_list_users())
+
+    assert [(u.id, u.email) for u in users] == [("a", "a@example.com"), ("b", "b@example.com"), ("c", "")]
+    assert len(recorder.requests) == 2
+
+
+def test_deleting_a_user_that_is_already_gone_succeeds():
+    rest, recorder = client_with(lambda _: httpx.Response(404))
+
+    run(rest.admin_delete_user("u1"))
+
+    assert recorder.requests[0].url.path == "/auth/v1/admin/users/u1"
+
+
+def test_deleting_rows_sends_the_filters():
+    rest, recorder = client_with(lambda _: httpx.Response(204))
+
+    run(rest.delete("notes", {"application_id": "eq.a1"}))
+
+    request = recorder.requests[0]
+    assert (request.method, request.url.path, request.url.params["application_id"]) == ("DELETE", "/rest/v1/notes", "eq.a1")
+
+
+def test_uploads_can_replace_an_existing_file():
+    rest, recorder = client_with(lambda _: httpx.Response(200))
+
+    run(rest.upload("u/profile.pdf", b"%PDF", "application/pdf", upsert=True))
+
+    assert recorder.requests[0].headers["x-upsert"] == "true"
