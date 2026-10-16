@@ -4,7 +4,7 @@ import pytest
 
 from app.config import DemoSettings
 from app.main import app
-from app.rate_limit import DEMO_LOGIN_LIMIT
+from app.rate_limit import DEMO_LOGIN_LIMIT, DEMO_LOGIN_TOTAL_LIMIT
 from app.routes.demo import get_demo_accounts, get_demo_settings, name_from_email
 
 HR_EMAIL = "hr.demo@example.com"
@@ -102,3 +102,13 @@ def test_sign_ins_from_one_address_are_rate_limited(client, demo_on):
 ])
 def test_names_are_made_from_the_email_local_part(email, name):
     assert name_from_email(email) == name
+
+
+def test_sign_ins_are_capped_across_all_addresses(client, demo_on, monkeypatch):
+    # A script can vary X-Forwarded-For per request; the total cap still holds.
+    monkeypatch.setattr(DEMO_LOGIN_TOTAL_LIMIT, "max_calls", 2)
+    monkeypatch.setattr(DEMO_LOGIN_LIMIT, "max_calls", 100)
+
+    statuses = [login(client, f"user{n}@example.com").status_code for n in range(3)]
+
+    assert statuses == [200, 200, 429]

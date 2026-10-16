@@ -2,11 +2,17 @@ import json
 from collections.abc import Callable
 
 import httpx
+import pytest
 
 from app.demo.accounts import SupabaseDemoAccounts
 from app.demo.store import SupabaseDemoStore
 from app.repository import SavedResume
 from tests.test_supabase_rest import client_with, run
+
+J1 = "10000000-0000-4000-8000-000000000001"
+J2 = "10000000-0000-4000-8000-000000000002"
+A1 = "20000000-0000-4000-8000-000000000001"
+A2 = "20000000-0000-4000-8000-000000000002"
 
 
 Reply = httpx.Response | Callable[[httpx.Request], httpx.Response]
@@ -58,18 +64,26 @@ def test_deletes_skip_the_call_when_there_is_nothing_to_delete():
     run(store.remove_files([]))
     assert recorder.requests == []
 
-    run(store.delete_jobs(["j1", "j2"]))
-    assert recorder.requests[0].url.params["id"] == "in.(j1,j2)"
+    run(store.delete_jobs([J1, J2]))
+    assert recorder.requests[0].url.params["id"] == f"in.({J1},{J2})"
+
+
+def test_filter_ids_must_be_uuids():
+    rest, recorder = client_with(routed({}))
+
+    with pytest.raises(ValueError):
+        run(SupabaseDemoStore(rest).delete_jobs(["1),id.not.is.null"]))
+    assert recorder.requests == []
 
 
 def test_history_is_replaced_for_the_seeded_applications_only():
     rest, recorder = client_with(routed({}))
 
-    run(SupabaseDemoStore(rest).replace_history(["a1", "a2"], [{"application_id": "a1"}], []))
+    run(SupabaseDemoStore(rest).replace_history([A1, A2], [{"application_id": A1}], []))
 
     calls = [(r.method, r.url.path) for r in recorder.requests]
     assert calls == [("DELETE", "/rest/v1/stage_events"), ("DELETE", "/rest/v1/notes"), ("POST", "/rest/v1/stage_events")]
-    assert recorder.requests[0].url.params["application_id"] == "in.(a1,a2)"
+    assert recorder.requests[0].url.params["application_id"] == f"in.({A1},{A2})"
 
 
 def test_reads_map_rows_to_the_values_the_restore_needs():
@@ -88,9 +102,9 @@ def test_reads_map_rows_to_the_values_the_restore_needs():
 
     assert [(a.id, a.resume_path) for a in run(store.list_applications())] == [("a1", "u/a1.pdf")]
     assert run(store.list_job_ids()) == ["j1"]
-    assert run(store.saved_resume_paths(["u1"])) == {"u1": "u1/profile-demo.pdf"}
+    assert run(store.saved_resume_paths([A1])) == {"u1": "u1/profile-demo.pdf"}
     assert run(store.saved_resume_paths([])) == {}
-    assert run(store.needing_score(["a1", "a2", "a3"], 1)) == ["a2", "a3"]
+    assert run(store.needing_score([A1, A2, "30000000-0000-4000-8000-000000000003"], 1)) == ["a2", "a3"]
     assert [u.email for u in run(store.list_users())] == ["a@example.com"]
 
 

@@ -20,7 +20,7 @@ from app.demo.reset import restore
 from app.demo.store import DemoStore, SupabaseDemoStore
 from app.errors import UserFacingError
 from app.gemini import JsonGenerator, get_generator
-from app.rate_limit import DEMO_LOGIN_LIMIT, DEMO_RESET_LIMIT
+from app.rate_limit import ALL_CALLERS, DEMO_LOGIN_LIMIT, DEMO_LOGIN_TOTAL_LIMIT, DEMO_RESET_LIMIT
 from app.supabase_rest import SupabaseNotConfigured, get_rest
 
 router = APIRouter(prefix="/api")
@@ -123,6 +123,7 @@ async def demo_login(body: DemoLoginRequest, request: Request, demo: Demo,
     if demo is None:
         raise DemoLoginOff()
     DEMO_LOGIN_LIMIT.check(f"ip:{request.client.host if request.client else 'unknown'}")
+    DEMO_LOGIN_TOTAL_LIMIT.check(ALL_CALLERS)
     role = "hr" if body.email in demo.hr_emails else "candidate"
     token = await accounts.sign_in_token(body.email, name_from_email(body.email), role)
     return DemoLoginReply(token_hash=token)

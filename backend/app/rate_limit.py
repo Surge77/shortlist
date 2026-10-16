@@ -36,6 +36,14 @@ class RateLimiter:
         if len(calls) >= self.max_calls:
             raise TooManyRequests()
         calls.append(now)
+        self._forget_idle(now)
+
+    def _forget_idle(self, now: float) -> None:
+        # Keys whose calls have all expired are dropped, so many one-off callers (or spoofed
+        # addresses) cannot grow the table without bound.
+        idle = [key for key, calls in self._calls.items() if not calls or now - calls[-1] >= self.window_seconds]
+        for key in idle:
+            del self._calls[key]
 
 
 # Generous for real use, tight enough that one account cannot drain the shared quota.
@@ -44,4 +52,8 @@ GEMINI_HR_LIMIT = RateLimiter(max_calls=60, window_seconds=HOUR_SECONDS)
 # Per client address. A classroom shares one address, so this allows a room to sign in
 # and out freely while stopping a script from creating accounts in bulk.
 DEMO_LOGIN_LIMIT = RateLimiter(max_calls=60, window_seconds=600)
+# Behind a proxy the client address comes from X-Forwarded-For, which a script can vary, so
+# a cap across everyone backs up the per-address limit. A class of 40 fits well inside it.
+DEMO_LOGIN_TOTAL_LIMIT = RateLimiter(max_calls=300, window_seconds=600)
+ALL_CALLERS = "all"
 DEMO_RESET_LIMIT = RateLimiter(max_calls=20, window_seconds=HOUR_SECONDS)

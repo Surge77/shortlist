@@ -51,3 +51,15 @@ def test_signed_out_callers_get_401_not_429(client, monkeypatch):
 
     assert client.post(f"/api/jobs/{OPEN_JOB_ID}/applications", files={"file": ("r.pdf", b"%PDF-")},
                        headers={"Authorization": ""}).status_code == 401
+
+
+def test_callers_whose_window_has_passed_are_forgotten():
+    now = [0.0]
+    limiter = RateLimiter(max_calls=1, window_seconds=10, clock=lambda: now[0])
+    for n in range(5):
+        limiter.check(f"caller-{n}")
+    now[0] = 11.0
+
+    limiter.check("late")
+
+    assert list(limiter._calls) == ["late"]

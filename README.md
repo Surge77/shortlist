@@ -94,6 +94,10 @@ the allowlist, and returns a one-time token; the browser turns it into an ordina
 session with `verifyOtp`. Row-level security still applies to every query. The trade-off is
 deliberate: anyone who knows an HR email can sign in as HR, so the mode is off by default.
 
+> **Never turn demo mode on for a Supabase project with real users.** Demo sign-in issues a
+> session for any existing email, and reset deletes every account that isn't in the seed or the
+> HR allowlist. Give the demo its own Supabase project.
+
 **Seed data.** `backend/app/demo/fixtures.json` holds 17 jobs across 11 departments (one a draft,
 for showing the requirement builder), 11 candidates and 23 applications with stage history and
 notes. The resumes are PDFs in `backend/app/demo/resumes/`, printed from

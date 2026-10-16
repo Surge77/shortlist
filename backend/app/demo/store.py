@@ -7,6 +7,7 @@ hundreds; the restore logic in reset.py depends only on the protocol, and tests 
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Protocol
+from uuid import UUID
 
 from app.repository import SavedResume
 from app.supabase_rest import AuthUser, SupabaseRest
@@ -41,7 +42,8 @@ class DemoStore(Protocol):
 
 
 def _in(ids: list[str]) -> str:
-    return f"in.({','.join(ids)})"
+    # Ids are interpolated into a PostgREST filter, so only well-formed UUIDs get in.
+    return f"in.({','.join(str(UUID(value)) for value in ids)})"
 
 
 def _one(value: Any) -> Any:
