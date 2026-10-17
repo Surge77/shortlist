@@ -150,6 +150,11 @@ The free plan sleeps after 15 minutes without visitors and takes about a minute 
 the site shortly before presenting. Supabase's free plan pauses a project after a week without
 activity; restore it from the Supabase dashboard if that happens.
 
+**Keep-alive.** Point an uptime monitor (UptimeRobot, every 5 minutes) at `/api/health/db`. It
+runs a one-row query, so the same ping keeps the Render service awake and counts as activity
+on Supabase. `/api/health` stays database-free for Render's own deploy checks. Render's 750
+free hours a month cover one always-on service per workspace.
+
 Other options:
 
 - **One service:** build the frontend, then run FastAPI (Railway, Render, a VM). Same origin,

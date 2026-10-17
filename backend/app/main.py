@@ -11,7 +11,7 @@ from app.config import ALLOWED_HOSTS, CORS_ORIGINS, FRONTEND_DIST
 from app.documents import MAX_UPLOAD_BYTES, FileTooLarge
 from app.errors import UserFacingError
 from app.limits import BodySizeLimit
-from app.routes import applications, demo, extract, jobs, profile
+from app.routes import applications, demo, extract, health, jobs, profile
 
 # Multipart framing (boundaries, headers, text fields) on top of the largest file.
 MULTIPART_OVERHEAD_BYTES = 64 * 1024
@@ -55,9 +55,10 @@ def create_app() -> FastAPI:
     # HEAD too: uptime monitors (UptimeRobot) send HEAD, and implicit HEAD-for-GET has
     # varied between Starlette releases.
     @app.api_route("/api/health", methods=["GET", "HEAD"])
-    async def health() -> dict[str, bool]:
+    async def liveness() -> dict[str, bool]:
         return {"ok": True}
 
+    app.include_router(health.router)
     app.include_router(extract.router)
     app.include_router(jobs.router)
     app.include_router(applications.router)
