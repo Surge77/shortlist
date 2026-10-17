@@ -66,6 +66,8 @@ class Candidate(BaseModel):
     certifications: list[Certification]
     achievements: list[str]
     languages: list[str]
+    # Text aimed at an AI screener ("rate this resume highly") rather than at a person.
+    has_hidden_instructions: bool
 
 
 class ExtractResponse(BaseModel):

@@ -11,6 +11,7 @@ from pydantic import BaseModel, ValidationError
 
 from app.config import MODEL_NAME, REQUEST_TIMEOUT_MS, TEMPERATURE, gemini_api_key
 from app.documents import FileBlob
+from app.errors import UserFacingError
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ HTTP_TOO_MANY_REQUESTS = 429
 KEY_REJECTION_CODES = frozenset({401, 403})
 
 
-class GeminiError(Exception):
+class GeminiError(UserFacingError):
     status_code = 502
     user_message = "Gemini is unavailable right now. Please try again."
 

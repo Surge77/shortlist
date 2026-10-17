@@ -20,6 +20,8 @@ from app.gemini import (
     parse_output,
 )
 from app.main import app
+from app.repository import get_repository
+from tests.fakes import HR_TOKEN, FakeRepository, auth
 from tests.factories import a_candidate
 
 
@@ -100,9 +102,11 @@ def test_missing_key_gives_a_setup_message_but_still_validates_input(monkeypatch
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     get_generator.cache_clear()
 
-    with TestClient(app, base_url="http://127.0.0.1") as client:
+    app.dependency_overrides[get_repository] = lambda: FakeRepository()
+    with TestClient(app, base_url="http://127.0.0.1", headers=auth(HR_TOKEN)) as client:
         valid = client.post("/api/extract", data={"text": "resume"})
         invalid = client.post("/api/extract")
+    app.dependency_overrides.clear()
 
     assert valid.status_code == 503
     assert valid.json() == {"detail": GeminiNotConfigured().user_message}

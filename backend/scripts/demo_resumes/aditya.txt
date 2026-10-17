@@ -1,0 +1,24 @@
+ADITYA KUMAR
+Cybersecurity Analyst | Hyderabad, India
+aditya.kumar@example.com | +91 90001 12345 | linkedin.com/in/aditya-kumar-example
+
+SUMMARY
+Security analyst with three years in a security operations centre, triaging alerts and leading incident response.
+
+EXPERIENCE
+Security Analyst, Granite Bank, Hyderabad (Mar 2024 - Present)
+- Monitor and tune Splunk SIEM detections across 4,000 endpoints
+- Led response to 25 incidents, from phishing to malware, with written post-incident reviews
+- Wrote Python scripts that enrich alerts with threat intelligence
+SOC Analyst, Sentrygate Services, Hyderabad (Jun 2022 - Feb 2024)
+- Triaged QRadar alerts on a 24x7 rota; escalated confirmed incidents
+- Reviewed firewall rules and VPN logs as part of network security audits
+
+EDUCATION
+B.Tech. Computer Science, Godavari Institute of Technology, 2018 - 2022
+
+SKILLS
+Splunk, QRadar, incident response, network security, firewalls, Python, Linux, AWS security basics
+
+CERTIFICATIONS
+CompTIA Security+, 2023

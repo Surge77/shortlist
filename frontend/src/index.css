@@ -2,6 +2,8 @@
 @import "./desk.css";
 @import "./lines.css";
 @import "./galley.css";
+@import "./portal.css";
+@import "./review.css";
 
 /* Galley proof. Cool galley stock and black type, with two proof pencils that each have
    one job: blue marks what code worked out, red marks what the recruiter must query and
@@ -17,6 +19,8 @@
   --faint: #dfe2db;
   --blue: #1e56c8;
   --blue-wash: rgb(30 86 200 / 0.12);
+  /* Chart bars: the blue, one step darker in dark mode so the bar stays in the chart lightness band. */
+  --chart-bar: #1e56c8;
   --red: #c81e17;
   --focus: #151515;
   --shadow: 0 16px 30px -22px rgb(20 24 18 / 0.5);
@@ -35,6 +39,7 @@
     --faint: #2a2e29;
     --blue: #86a9ff;
     --blue-wash: rgb(134 169 255 / 0.16);
+    --chart-bar: #6a8ff0;
     --red: #ff6b5e;
     --focus: #eceee9;
     --shadow: 0 16px 30px -22px rgb(0 0 0 / 0.8);
@@ -53,6 +58,7 @@
   --faint: #2a2e29;
   --blue: #86a9ff;
   --blue-wash: rgb(134 169 255 / 0.16);
+  --chart-bar: #6a8ff0;
   --red: #ff6b5e;
   --focus: #eceee9;
   --shadow: 0 16px 30px -22px rgb(0 0 0 / 0.8);

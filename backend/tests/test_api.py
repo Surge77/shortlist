@@ -1,13 +1,23 @@
+import asyncio
+
 import pytest
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.documents import MAX_UPLOAD_BYTES
 from app.gemini import GeminiRateLimited, GeminiUnavailable
+from app.main import SinglePageApp
 from tests.factories import a_candidate, a_job, docx_bytes
 from tests.test_documents import PDF, PNG
 
 
 def test_health_reports_ok(client):
     assert client.get("/api/health").json() == {"ok": True}
+
+
+def test_health_answers_head_requests_as_uptime_monitors_send(client):
+    response = client.head("/api/health")
+
+    assert response.status_code == 200
 
 
 def test_pasted_text_is_sent_inside_resume_tags(client, fake_generator):
@@ -137,3 +147,15 @@ def test_gemini_failures_become_clean_http_errors(client, fake_generator, error,
 
     assert response.status_code == status
     assert response.json() == {"detail": error.user_message}
+
+
+def test_deep_links_fall_back_to_the_frontend(tmp_path):
+    (tmp_path / "index.html").write_text("<div id=root></div>", encoding="utf-8")
+    spa = SinglePageApp(directory=tmp_path, html=True)
+    scope = {"type": "http", "method": "GET", "headers": [], "path": "/hr/jobs/1"}
+
+    response = asyncio.run(spa.get_response("hr/jobs/1", scope))
+    assert response.status_code == 200
+
+    with pytest.raises(StarletteHTTPException):
+        asyncio.run(spa.get_response("api/unknown", scope))

@@ -1,0 +1,21 @@
+SNEHA IYER
+Frontend Engineer | Bengaluru, India
+sneha.iyer@example.com | +91 90000 34567 | sneha-iyer.example.dev
+
+SUMMARY
+Frontend engineer who builds accessible React interfaces and the design systems behind them.
+
+EXPERIENCE
+Frontend Engineer, Lumen Health, Bengaluru (Jun 2023 - Present)
+- Rebuilt the patient booking flow in React and TypeScript, raising completed bookings by 18%
+- Maintain a component library of 60 components documented in Storybook
+- Wrote unit tests with Vitest and Testing Library; coverage went from 35% to 82%
+Junior Frontend Developer, Pixelcraft Studio, Chennai (Jul 2021 - May 2023)
+- Built marketing sites and dashboards with Next.js, CSS modules and Tailwind CSS
+- Worked with designers in Figma to turn mock-ups into responsive pages
+
+EDUCATION
+B.Tech. Information Technology, Coromandel College of Engineering, Chennai, 2017 - 2021
+
+SKILLS
+React, TypeScript, JavaScript, Next.js, CSS, Tailwind CSS, Vitest, Testing Library, Storybook, Figma, accessibility (WCAG 2.2)

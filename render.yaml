@@ -1,0 +1,37 @@
+# Render Blueprint: one free web service built from the Dockerfile.
+# Values marked sync: false are entered in the Render dashboard when the Blueprint is
+# created, so no secret lives in this repository.
+services:
+  - type: web
+    name: shortlist
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: feature/hiring-portal
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      # Read at build time (Dockerfile ARGs) and baked into the public bundle.
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      # Email-only sign-in for the class demo (fictional data only). Remove DEMO_LOGIN to
+      # go back to passwords; the allowlist alone decides who signs in as HR.
+      - key: DEMO_LOGIN
+        value: "true"
+      - key: DEMO_HR_EMAILS
+        value: hr.demo@example.com
+      - key: DEMO_CANDIDATE_EMAIL
+        value: riya.demo@example.com
+      # The host check guards a server on localhost against DNS rebinding; behind Render's
+      # proxy, with health checks arriving on internal hostnames, it only gets in the way.
+      - key: EXTRA_ALLOWED_HOSTS
+        value: "*"

@@ -1,0 +1,21 @@
+DEV MALHOTRA
+Customer Support Specialist | Delhi NCR, India
+dev.malhotra@example.com | +91 90000 01234
+
+SUMMARY
+Customer support professional with three years of solving customer problems in writing and by phone, now moving towards customer-facing sales.
+
+EXPERIENCE
+Senior Support Executive, Streamnest, Gurugram (Jan 2024 - Present)
+- Resolve 60 tickets a day in Zendesk with a 96% customer satisfaction score
+- Write help-centre articles that cut repeat tickets by 15%
+- Use basic SQL to look up account data for escalations
+Support Executive, Parcelpoint, Noida (Sep 2022 - Dec 2023)
+- Handled inbound calls and chat in English and Hindi; trained six new hires
+- Called back churned customers to win them back, renewing 120 accounts
+
+EDUCATION
+B.A. English, Yamuna College, Delhi, 2019 - 2022
+
+SKILLS
+Customer support, Zendesk, Freshdesk, written and spoken English, Hindi, basic SQL, CRM (HubSpot), phone outreach

@@ -1,0 +1,25 @@
+KARAN SINGH
+Computer Science Student | Bengaluru, India
+karan.singh@example.com | +91 90000 45678 | github.com/karan-singh-example
+
+SUMMARY
+Final-year computer science student who enjoys building and evaluating machine learning models.
+
+EDUCATION
+B.Tech. Computer Science (pursuing), Kaveri Institute of Technology, Bengaluru, 2023 - 2027, CGPA 8.9
+
+PROJECTS
+Loan Default Predictor - gradient boosting model in scikit-learn on 50,000 loan records, ROC-AUC 0.87
+- Cleaned and engineered features with pandas and NumPy; compared models with cross-validation
+Review Sentiment Classifier - fine-tuned a small transformer in PyTorch on 20,000 product reviews (NLP)
+Campus Canteen Forecast - forecasted daily meal demand with a time-series model; cut food waste in a pilot
+
+EXPERIENCE
+Machine Learning Intern, Cedar Analytics, Bengaluru (May 2025 - Jul 2025)
+- Built a churn baseline in scikit-learn and documented the evaluation in Jupyter notebooks
+
+SKILLS
+Python, pandas, NumPy, scikit-learn, PyTorch, NLP, Jupyter, Git, SQL (basic)
+
+ACHIEVEMENTS
+Top 5% in the college data science hackathon, 2025

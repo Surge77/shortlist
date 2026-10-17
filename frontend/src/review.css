@@ -1,0 +1,142 @@
+/* HR review: the applicant ledger, the score with its working, and the audit timeline. */
+
+.ledger-wrap {
+  overflow-x: auto;
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger th {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--ink);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.ledger td {
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--hair);
+  vertical-align: top;
+}
+
+.ledger tbody tr:hover {
+  background: var(--faint);
+}
+
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-value {
+  display: block;
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.score-figure {
+  color: var(--ink);
+  font-size: 3rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.bar {
+  height: 0.45rem;
+  margin-top: 0.35rem;
+  border: 1px solid var(--hair);
+  background: var(--sheet);
+}
+
+.bar > span {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+}
+
+.verdicts > li {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.15rem 0.5rem;
+  padding-block: 0.6rem;
+  border-bottom: 1px solid var(--faint);
+}
+
+.verdict-mark {
+  font-weight: 800;
+  text-align: center;
+}
+
+.verdict-met {
+  color: var(--blue);
+}
+
+.verdict-partial {
+  color: var(--ink);
+}
+
+.verdict-missing {
+  color: var(--red);
+}
+
+.evidence {
+  grid-column: 2;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--hair);
+  color: var(--muted);
+  font: 400 0.85rem/1.6 var(--font-typed);
+}
+
+.flags > li {
+  padding-block: 0.35rem;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.timeline > li {
+  padding-block: 0.4rem;
+  border-bottom: 1px solid var(--faint);
+  font-size: 0.9rem;
+}
+
+/* Compare: requirement names run down the left as row headers, in body type rather than
+   the column headers' small capitals; a missing requirement wears the red query pencil. */
+.compare tbody th {
+  min-width: 14rem;
+  border-bottom: 1px solid var(--hair);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  vertical-align: top;
+}
+
+.compare td {
+  min-width: 12rem;
+}
+
+.compare-missing {
+  color: var(--red);
+}
+
+.compare-quote {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}

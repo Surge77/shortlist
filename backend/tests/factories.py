@@ -39,6 +39,7 @@ def a_candidate(*, contact: dict[str, Any] | None = None, **overrides: Any) -> C
         "certifications": [],
         "achievements": [],
         "languages": ["English", "Hindi"],
+        "has_hidden_instructions": False,
     }
     return Candidate(**{**fields, **overrides})
 
